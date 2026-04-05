@@ -240,7 +240,7 @@ ContainmentItem {
         }
     }
 
-    // --- Drag state (wired up in Task 10) ---
+    // --- Drag state ---
     property bool isDraggingIcon: false
     property string dragIconUrl: ""
     property string dragSourceFenceId: ""
@@ -251,7 +251,52 @@ ContainmentItem {
         isDraggingIcon = true;
     }
 
-    // --- Placeholder for desktop gestures (wired up in Tasks 10-12) ---
+    function finishIconDrop(dropX, dropY) {
+        var targetFence = hitTestFence(dropX, dropY);
+        FenceModel.unassignIconFromAll(fences, dragIconUrl);
+
+        if (targetFence) {
+            var cell = FenceModel.nextEmptyCell(targetFence);
+            FenceModel.assignIcon(fences, targetFence.id, dragIconUrl, cell.col, cell.row);
+        }
+
+        isDraggingIcon = false;
+        dragIconUrl = "";
+        dragSourceFenceId = "";
+        persistFences();
+    }
+
+    // Drag proxy (floating icon that follows mouse during drag)
+    Kirigami.Icon {
+        id: dragProxy
+        visible: root.isDraggingIcon
+        width: 48; height: 48
+        opacity: 0.8
+        z: 10001
+        source: root.dragIconUrl
+            ? IconHelper.iconForFile(root.dragIconUrl.split('/').pop(), false)
+            : ""
+    }
+
+    // Drag overlay (captures all mouse events during icon drag)
+    MouseArea {
+        id: dragOverlay
+        anchors.fill: parent
+        z: 10000
+        visible: root.isDraggingIcon
+        cursorShape: Qt.ClosedHandCursor
+
+        onPositionChanged: function(mouse) {
+            dragProxy.x = mouse.x - 24;
+            dragProxy.y = mouse.y - 24;
+        }
+
+        onReleased: function(mouse) {
+            root.finishIconDrop(mouse.x, mouse.y);
+        }
+    }
+
+    // --- Desktop gestures ---
     MouseArea {
         id: desktopMouse
         anchors.fill: parent
@@ -259,7 +304,9 @@ ContainmentItem {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onClicked: function(mouse) {
-            root.selectedIconUrl = "";
+            if (mouse.button === Qt.LeftButton) {
+                root.selectedIconUrl = "";
+            }
         }
     }
 
