@@ -296,6 +296,11 @@ ContainmentItem {
         }
     }
 
+    SelectionRectangle {
+        id: selectionRect
+        z: 9999
+    }
+
     // --- Desktop gestures ---
     MouseArea {
         id: desktopMouse
@@ -303,9 +308,49 @@ ContainmentItem {
         z: -1
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onClicked: function(mouse) {
+        property bool drawing: false
+        property point pressPos
+
+        onPressed: function(mouse) {
+            pressPos = Qt.point(mouse.x, mouse.y);
+            drawing = false;
+
             if (mouse.button === Qt.LeftButton) {
                 root.selectedIconUrl = "";
+            }
+        }
+
+        onPositionChanged: function(mouse) {
+            if (pressed && mouse.button !== Qt.RightButton) {
+                if (!drawing) {
+                    var dx = mouse.x - pressPos.x;
+                    var dy = mouse.y - pressPos.y;
+                    if (Math.sqrt(dx * dx + dy * dy) > 10) {
+                        drawing = true;
+                        selectionRect.begin(pressPos);
+                    }
+                }
+                if (drawing) {
+                    selectionRect.update(Qt.point(mouse.x, mouse.y));
+                }
+            }
+        }
+
+        onReleased: function(mouse) {
+            if (drawing) {
+                var rect = selectionRect.finish();
+                drawing = false;
+                if (rect.width >= 100 && rect.height >= 80) {
+                    FenceModel.createFence(root.fences, rect.x, rect.y,
+                                           rect.width, rect.height, "New Fence");
+                    root.persistFences();
+                }
+            }
+        }
+
+        onDoubleClicked: function(mouse) {
+            if (mouse.button === Qt.LeftButton && !drawing) {
+                root.fencesVisible = !root.fencesVisible;
             }
         }
     }
