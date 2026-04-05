@@ -237,6 +237,10 @@ ContainmentItem {
                 root.maxZ++;
                 z = root.maxZ;
             }
+            onContextMenuRequested: function(fid) {
+                fenceMenu.targetFenceId = fid;
+                fenceMenu.popup();
+            }
         }
     }
 
@@ -318,6 +322,9 @@ ContainmentItem {
             if (mouse.button === Qt.LeftButton) {
                 root.selectedIconUrl = "";
             }
+            if (mouse.button === Qt.RightButton) {
+                desktopMenu.popup();
+            }
         }
 
         onPositionChanged: function(mouse) {
@@ -355,10 +362,77 @@ ContainmentItem {
         }
     }
 
-    // --- Placeholder context menus (wired up in Task 12) ---
+    // --- Context menus ---
+    PlasmaComponents.Menu {
+        id: desktopMenu
+
+        PlasmaComponents.MenuItem {
+            text: "New Fence"
+            icon.name: "list-add"
+            onClicked: {
+                FenceModel.createFence(root.fences, 100, 100, 400, 300, "New Fence");
+                root.persistFences();
+            }
+        }
+        PlasmaComponents.MenuItem {
+            text: "Show All Fences"
+            icon.name: "view-visible"
+            enabled: !root.fencesVisible
+            onClicked: root.fencesVisible = true
+        }
+        PlasmaComponents.MenuItem {
+            text: "Hide All Fences"
+            icon.name: "view-hidden"
+            enabled: root.fencesVisible
+            onClicked: root.fencesVisible = false
+        }
+    }
+
     PlasmaComponents.Menu {
         id: iconMenu
         property string iconUrl: ""
         property string inFenceId: ""
+
+        PlasmaComponents.MenuItem {
+            text: "Open"
+            icon.name: "document-open"
+            onClicked: Qt.openUrlExternally(iconMenu.iconUrl)
+        }
+        PlasmaComponents.MenuItem {
+            text: "Remove from Fence"
+            icon.name: "edit-delete-remove"
+            visible: iconMenu.inFenceId !== ""
+            onClicked: {
+                FenceModel.unassignIconFromAll(root.fences, iconMenu.iconUrl);
+                root.persistFences();
+            }
+        }
+    }
+
+    PlasmaComponents.Menu {
+        id: fenceMenu
+        property string targetFenceId: ""
+
+        PlasmaComponents.MenuItem {
+            text: "Rename"
+            icon.name: "edit-rename"
+            onClicked: {
+                for (var i = 0; i < fenceRepeater.count; i++) {
+                    var item = fenceRepeater.itemAt(i);
+                    if (item && item.fenceId === fenceMenu.targetFenceId) {
+                        item.triggerRename();
+                        break;
+                    }
+                }
+            }
+        }
+        PlasmaComponents.MenuItem {
+            text: "Delete Fence"
+            icon.name: "edit-delete"
+            onClicked: {
+                FenceModel.deleteFence(root.fences, fenceMenu.targetFenceId);
+                root.persistFences();
+            }
+        }
     }
 }
