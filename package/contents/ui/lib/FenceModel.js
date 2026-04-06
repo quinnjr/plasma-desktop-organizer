@@ -22,7 +22,7 @@ function saveFences(fences) {
     return JSON.stringify(fences);
 }
 
-function createFence(fences, x, y, width, height, title) {
+function createFence(fences, x, y, width, height, title, iconSize) {
     var fence = {
         id: generateId(),
         title: (title && title.length > 0) ? title : "New Fence",
@@ -31,7 +31,7 @@ function createFence(fences, x, y, width, height, title) {
         width: Math.max(width, 200),
         height: Math.max(height, 150),
         rolledUp: false,
-        iconSize: 64,
+        iconSize: iconSize || 64,
         icons: []
     };
     fences.push(fence);

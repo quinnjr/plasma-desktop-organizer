@@ -143,7 +143,7 @@ ContainmentItem {
                 fileUrl: modelData.url
                 fileName: modelData.fileName
                 fileIsDir: modelData.isDir
-                iconSize: 64
+                iconSize: Plasmoid.configuration.iconSize
                 selected: fileUrl === root.selectedIconUrl
 
                 onClicked: function(mouse) {
@@ -176,6 +176,8 @@ ContainmentItem {
             iconSize: modelData.iconSize || 64
             rolledUp: modelData.rolledUp || false
             initialHeight: modelData.height
+            fenceOpacity: Plasmoid.configuration.fenceOpacity / 100
+            animationSpeed: Plasmoid.configuration.animationSpeed
 
             x: modelData.x
             y: modelData.y
@@ -187,10 +189,10 @@ ContainmentItem {
             enabled: root.fencesVisible
 
             Behavior on opacity {
-                NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+                NumberAnimation { duration: Plasmoid.configuration.animationSpeed; easing.type: Easing.InOutQuad }
             }
             Behavior on scale {
-                NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+                NumberAnimation { duration: Plasmoid.configuration.animationSpeed; easing.type: Easing.InOutQuad }
             }
 
             onTitleChanged: function(fid, newTitle) {
@@ -357,7 +359,9 @@ ContainmentItem {
                 drawing = false;
                 if (rect.width >= 100 && rect.height >= 80) {
                     var newFence = FenceModel.createFence(root.fences, rect.x, rect.y,
-                                           rect.width, rect.height, "New Fence");
+                                           rect.width, rect.height,
+                                           Plasmoid.configuration.defaultFenceTitle,
+                                           Plasmoid.configuration.iconSize);
                     root.persistFences();
                     // Trigger inline rename on the new fence after Repeater instantiates it
                     var newId = newFence.id;
@@ -375,7 +379,7 @@ ContainmentItem {
         }
 
         onDoubleClicked: function(mouse) {
-            if (mouse.button === Qt.LeftButton && !drawing) {
+            if (mouse.button === Qt.LeftButton && !drawing && Plasmoid.configuration.doubleClickToHide) {
                 root.fencesVisible = !root.fencesVisible;
             }
         }
@@ -389,7 +393,9 @@ ContainmentItem {
             text: "New Fence"
             icon.name: "list-add"
             onClicked: {
-                FenceModel.createFence(root.fences, 100, 100, 400, 300, "New Fence");
+                FenceModel.createFence(root.fences, 100, 100, 400, 300,
+                    Plasmoid.configuration.defaultFenceTitle,
+                    Plasmoid.configuration.iconSize);
                 root.persistFences();
             }
         }

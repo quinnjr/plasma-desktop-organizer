@@ -17,6 +17,8 @@ Item {
     property int minWidth: 200
     property int minHeight: 150
     property real expandedHeight: initialHeight
+    property real fenceOpacity: 0.8
+    property int animationSpeed: 200
 
     signal titleChanged(string fenceId, string newTitle)
     signal rollupToggled(string fenceId)
@@ -36,7 +38,7 @@ Item {
                              : expandedHeight
 
     Behavior on implicitHeight {
-        NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+        NumberAnimation { duration: fence.animationSpeed; easing.type: Easing.InOutQuad }
     }
 
     height: implicitHeight
@@ -47,6 +49,7 @@ Item {
         anchors.fill: parent
         imagePath: "widgets/background"
         enabledBorders: KSvg.FrameSvgItem.AllBorders
+        opacity: fence.fenceOpacity
     }
 
     // Click to activate / right-click for context menu
