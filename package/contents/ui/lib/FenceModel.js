@@ -78,7 +78,8 @@ function unassignIconFromAll(fences, url) {
 
 function nextEmptyCell(fence) {
     var spacing = 16;
-    var cols = Math.max(1, Math.floor(fence.width / (fence.iconSize + spacing)));
+    var iconMargin = 16;
+    var cols = Math.max(1, Math.floor(fence.width / (fence.iconSize + spacing + iconMargin)));
     var occupied = {};
     for (var i = 0; i < fence.icons.length; i++) {
         var icon = fence.icons[i];

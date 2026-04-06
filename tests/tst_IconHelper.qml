@@ -77,5 +77,13 @@ Item {
             var result = IconHelper.parseDesktopEntry(content);
             compare(result.name, "English");
         }
+
+        function test_parseDesktopEntryIgnoresActionSections() {
+            var content = "[Desktop Entry]\nName=Firefox\nIcon=firefox\nExec=firefox\n\n[Desktop Action NewWindow]\nName=New Window\nIcon=window-new\nExec=firefox --new-window";
+            var result = IconHelper.parseDesktopEntry(content);
+            compare(result.name, "Firefox");
+            compare(result.icon, "firefox");
+            compare(result.exec, "firefox");
+        }
     }
 }

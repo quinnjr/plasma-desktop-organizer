@@ -180,7 +180,6 @@ ContainmentItem {
             x: modelData.x
             y: modelData.y
             width: modelData.width
-            height: modelData.height
             z: 1
 
             opacity: root.fencesVisible ? 1 : 0
@@ -277,9 +276,18 @@ ContainmentItem {
         width: 48; height: 48
         opacity: 0.8
         z: 10001
-        source: root.dragIconUrl
-            ? IconHelper.iconForFile(root.dragIconUrl.split('/').pop(), false)
-            : ""
+        source: {
+            if (!root.dragIconUrl) return "";
+            var name = root.dragIconUrl.split('/').pop();
+            var isDir = false;
+            for (var i = 0; i < root.desktopFilesList.length; i++) {
+                if (root.desktopFilesList[i].url === root.dragIconUrl) {
+                    isDir = root.desktopFilesList[i].isDir;
+                    break;
+                }
+            }
+            return IconHelper.iconForFile(name, isDir);
+        }
     }
 
     // Drag overlay (captures all mouse events during icon drag)
@@ -328,7 +336,7 @@ ContainmentItem {
         }
 
         onPositionChanged: function(mouse) {
-            if (pressed && mouse.button !== Qt.RightButton) {
+            if (pressed && !(mouse.buttons & Qt.RightButton)) {
                 if (!drawing) {
                     var dx = mouse.x - pressPos.x;
                     var dy = mouse.y - pressPos.y;
@@ -348,9 +356,20 @@ ContainmentItem {
                 var rect = selectionRect.finish();
                 drawing = false;
                 if (rect.width >= 100 && rect.height >= 80) {
-                    FenceModel.createFence(root.fences, rect.x, rect.y,
+                    var newFence = FenceModel.createFence(root.fences, rect.x, rect.y,
                                            rect.width, rect.height, "New Fence");
                     root.persistFences();
+                    // Trigger inline rename on the new fence after Repeater instantiates it
+                    var newId = newFence.id;
+                    Qt.callLater(function() {
+                        for (var i = 0; i < fenceRepeater.count; i++) {
+                            var item = fenceRepeater.itemAt(i);
+                            if (item && item.fenceId === newId) {
+                                item.triggerRename();
+                                break;
+                            }
+                        }
+                    });
                 }
             }
         }

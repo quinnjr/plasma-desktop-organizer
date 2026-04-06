@@ -63,8 +63,18 @@ function parseDesktopEntry(content) {
     if (!content) return result;
 
     var lines = content.split('\n');
+    var inDesktopEntry = false;
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i].trim();
+        if (line === "[Desktop Entry]") {
+            inDesktopEntry = true;
+            continue;
+        }
+        if (line.length > 0 && line.charAt(0) === '[') {
+            if (inDesktopEntry) break; // hit next section, stop
+            continue;
+        }
+        if (!inDesktopEntry) continue;
         if (line.indexOf("Name=") === 0 && !result.name) {
             result.name = line.substring(5);
         } else if (line.indexOf("Icon=") === 0) {
