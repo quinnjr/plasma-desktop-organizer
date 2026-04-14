@@ -6,7 +6,7 @@ Application::Application(int &argc, char **argv)
 {
     setApplicationName(QStringLiteral("plasma-organizer"));
     setOrganizationDomain(QStringLiteral("dev.quinnjr"));
-    setApplicationVersion(QStringLiteral("0.1.0"));
+    setApplicationVersion(QStringLiteral(PROJECT_VERSION_STRING));
 }
 
 Application::~Application() = default;

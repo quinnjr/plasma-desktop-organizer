@@ -28,17 +28,21 @@ add_library(organizer_core STATIC
     src/application.cpp
 )
 target_include_directories(organizer_core PUBLIC src)
+target_compile_definitions(organizer_core PRIVATE
+    PROJECT_VERSION_STRING="${PROJECT_VERSION}"
+)
 target_link_libraries(organizer_core PUBLIC
     Qt6::Core
     Qt6::Gui
     KF6::CoreAddons
+)
+target_link_libraries(organizer_core PRIVATE
     KF6::KIOCore
 )
 
 add_executable(plasma-organizer
     src/main.cpp
 )
-target_include_directories(plasma-organizer PRIVATE src)
 target_link_libraries(plasma-organizer PRIVATE
     organizer_core
     Qt6::Core
