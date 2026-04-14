@@ -13,7 +13,7 @@ LayerShellWindow::LayerShellWindow(QScreen *screen,
     , m_screen(screen)
     , m_mgr(mgr)
     , m_model(new FenceModel(mgr, this))
-    , m_view(new QQuickView)
+    , m_view(std::make_unique<QQuickView>())
 {
     m_view->setScreen(screen);
     m_view->setResizeMode(QQuickView::SizeRootObjectToView);
@@ -34,10 +34,7 @@ LayerShellWindow::LayerShellWindow(QScreen *screen,
     setupLayerShell();
 }
 
-LayerShellWindow::~LayerShellWindow()
-{
-    delete m_view;
-}
+LayerShellWindow::~LayerShellWindow() = default;
 
 void LayerShellWindow::setupLayerShell()
 {
@@ -45,7 +42,12 @@ void LayerShellWindow::setupLayerShell()
     // must be called after the surface exists.
     m_view->show();
 
-    auto *layerShell = LayerShellQt::Window::get(m_view);
+    auto *layerShell = LayerShellQt::Window::get(m_view.get());
+    if (!layerShell) {
+        qWarning() << "LayerShellWindow: compositor does not support"
+                      " zwlr_layer_shell_v1; overlay will not appear";
+        return;
+    }
     layerShell->setLayer(LayerShellQt::Window::LayerBottom);
     layerShell->setAnchors(LayerShellQt::Window::Anchors(
         LayerShellQt::Window::AnchorTop

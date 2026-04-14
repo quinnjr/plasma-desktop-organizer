@@ -2,6 +2,7 @@
 #include <QObject>
 #include <QQuickView>
 #include <QScreen>
+#include <memory>
 
 class FenceManager;
 class FenceModel;
@@ -24,5 +25,5 @@ private:
     QScreen *m_screen;
     FenceManager *m_mgr;
     FenceModel *m_model;
-    QQuickView *m_view;
+    std::unique_ptr<QQuickView> m_view;
 };
