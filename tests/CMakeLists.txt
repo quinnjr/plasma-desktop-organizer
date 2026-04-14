@@ -13,4 +13,4 @@ function(add_organizer_test name)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
-# Tests are added in subsequent tasks
+add_organizer_test(test_fencemanager)
