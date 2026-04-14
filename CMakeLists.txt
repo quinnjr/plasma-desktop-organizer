@@ -27,6 +27,7 @@ find_package(LayerShellQt REQUIRED)
 add_library(organizer_core STATIC
     src/application.cpp
     src/fencemanager.cpp
+    src/fencemodel.cpp
 )
 target_include_directories(organizer_core PUBLIC src)
 target_compile_definitions(organizer_core PRIVATE

@@ -14,3 +14,4 @@ function(add_organizer_test name)
 endfunction()
 
 add_organizer_test(test_fencemanager)
+add_organizer_test(test_fencemodel)
