@@ -39,8 +39,11 @@ private Q_SLOTS:
         Fence f = mgr.createFence(QStringLiteral("DP-1"), QRect(0,0,400,300));
         QCOMPARE(mgr.fences().size(), 1);
 
+        QSignalSpy spy(&mgr, &FenceManager::fenceRemoved);
         mgr.deleteFence(f.id);
         QCOMPARE(mgr.fences().size(), 0);
+        QCOMPARE(spy.count(), 1);
+        QCOMPARE(spy.first().first().toInt(), 0); // index 0 was the only fence
     }
 
     void jsonRoundTrip() {
@@ -63,10 +66,12 @@ private Q_SLOTS:
             QCOMPARE(f.y, 60);
             QCOMPARE(f.width, 500);
             QCOMPARE(f.height, 250);
+            QCOMPARE(f.rolledUp, false);
+            QCOMPARE(f.iconSize, 64);
         }
     }
 
-    void updateFence_persistsChanges() {
+    void updateFence_updatesInMemory() {
         QTemporaryDir tmp;
         FenceManager mgr(tmp.path());
         Fence f = mgr.createFence(QStringLiteral("DP-1"), QRect(0,0,400,300));

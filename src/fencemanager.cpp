@@ -27,6 +27,8 @@ FenceManager::~FenceManager()
 
 FenceManager *FenceManager::instance()
 {
+    Q_ASSERT_X(s_instance, "FenceManager::instance",
+               "FenceManager must be constructed before calling instance()");
     return s_instance;
 }
 
@@ -60,8 +62,8 @@ void FenceManager::deleteFence(const QString &id)
 {
     for (int i = 0; i < m_fences.size(); ++i) {
         if (m_fences[i].id == id) {
-            m_fences.removeAt(i);
             Q_EMIT fenceRemoved(i);
+            m_fences.removeAt(i);
             return;
         }
     }
