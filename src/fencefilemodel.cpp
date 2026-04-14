@@ -56,17 +56,17 @@ QVariant FenceFileModel::data(const QModelIndex &index, int role) const
         return item.isDir();
     case DisplayNameRole: {
         if (item.name().endsWith(QLatin1String(".desktop"))) {
-            KDesktopFile df(item.localPath());
-            const QString name = df.readName();
-            if (!name.isEmpty()) return name;
+            auto it = m_desktopCache.constFind(item.localPath());
+            if (it != m_desktopCache.constEnd() && !it->first.isEmpty())
+                return it->first;
         }
         return item.name();
     }
     case IconNameRole: {
         if (item.name().endsWith(QLatin1String(".desktop"))) {
-            KDesktopFile df(item.localPath());
-            const QString icon = df.readIcon();
-            if (!icon.isEmpty()) return icon;
+            auto it = m_desktopCache.constFind(item.localPath());
+            if (it != m_desktopCache.constEnd() && !it->second.isEmpty())
+                return it->second;
         }
         return item.iconName();
     }
@@ -96,6 +96,12 @@ void FenceFileModel::onDirty(const QString &path)
         int i = findByPath(path);
         if (i >= 0) {
             m_items[i].refresh();
+            if (m_items[i].name().endsWith(QLatin1String(".desktop"))) {
+                KDesktopFile df(path);
+                m_desktopCache.insert(path, {df.readName(), df.readIcon()});
+            } else {
+                m_desktopCache.remove(path);
+            }
             const QModelIndex mi = index(i);
             Q_EMIT dataChanged(mi, mi);
         }
@@ -133,6 +139,16 @@ void FenceFileModel::refresh()
         m_items.append(KFileItem(QUrl::fromLocalFile(fi.absoluteFilePath())));
     }
     endResetModel();
+
+    // Populate .desktop metadata cache
+    m_desktopCache.clear();
+    for (const KFileItem &item : m_items) {
+        if (item.name().endsWith(QLatin1String(".desktop"))) {
+            KDesktopFile df(item.localPath());
+            m_desktopCache.insert(item.localPath(),
+                                  {df.readName(), df.readIcon()});
+        }
+    }
 }
 
 int FenceFileModel::findByPath(const QString &path) const

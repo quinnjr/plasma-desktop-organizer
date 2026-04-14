@@ -43,8 +43,6 @@ private Q_SLOTS:
         f.open(QIODevice::WriteOnly); f.write("x"); f.close();
 
         FenceFileModel model(tmp.path());
-        // allow KDirWatch initial scan to settle
-        QTest::qWait(500);
 
         QCOMPARE(model.rowCount(), 1);
         const QModelIndex idx = model.index(0);

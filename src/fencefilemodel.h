@@ -1,5 +1,7 @@
 #pragma once
 #include <QAbstractListModel>
+#include <QHash>
+#include <QPair>
 #include <QUrl>
 #include <KDirWatch>
 #include <KFileItem>
@@ -37,4 +39,8 @@ private:
     QString m_directory;
     KDirWatch *m_watch;
     QList<KFileItem> m_items;
+
+    // Cache for .desktop file Name= and Icon= fields; keyed by local path.
+    // Populated in refresh(), updated in onDirty() for individual file changes.
+    mutable QHash<QString, QPair<QString, QString>> m_desktopCache;
 };
