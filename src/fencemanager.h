@@ -22,6 +22,11 @@ public:
 
     Q_INVOKABLE QString fenceDirectory(const QString &fenceId) const;
 
+    Q_INVOKABLE void renameFence(const QString &id, const QString &title);
+    Q_INVOKABLE void moveFence(const QString &id, int x, int y);
+    Q_INVOKABLE void resizeFence(const QString &id, int x, int y, int width, int height);
+    Q_INVOKABLE void setRolledUp(const QString &id, bool rolledUp);
+
     void load();
     void save();
 

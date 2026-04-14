@@ -5,10 +5,13 @@ Item {
     id: root
     anchors.fill: parent
 
+    property bool fencesVisible: true
+
     Repeater {
+        id: fenceRepeater
         model: fenceModel
 
-        delegate: Rectangle {
+        delegate: FenceContainer {
             required property string fenceId
             required property string title
             required property int fenceX
@@ -21,19 +24,32 @@ Item {
             x: fenceX
             y: fenceY
             width: fenceWidth
-            height: rolledUp ? 32 : fenceHeight
-            color: "#44000088"
-            border.color: "#aa6666ff"
-            border.width: 1
-            radius: 6
+            height: rolledUp ? 28 : fenceHeight
 
-            Text {
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.margins: 8
-                text: title
-                color: "white"
-                font.bold: true
+            fenceId: fenceId
+            title: title
+            rolledUp: rolledUp
+            iconSize: iconSize
+
+            opacity: root.fencesVisible ? 1.0 : 0.0
+            Behavior on opacity {
+                NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+            }
+
+            onTitleEdited: function(fid, newTitle) {
+                fenceManager.renameFence(fid, newTitle);
+            }
+            onRollupToggled: function(fid) {
+                fenceManager.setRolledUp(fid, !rolledUp);
+            }
+            onCloseRequested: function(fid) {
+                fenceManager.deleteFence(fid);
+            }
+            onMoveFinished: function(fid, nx, ny) {
+                fenceManager.moveFence(fid, nx, ny);
+            }
+            onResizeFinished: function(fid, nx, ny, nw, nh) {
+                fenceManager.resizeFence(fid, nx, ny, nw, nh);
             }
         }
     }

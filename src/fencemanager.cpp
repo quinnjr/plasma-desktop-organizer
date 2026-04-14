@@ -80,6 +80,58 @@ void FenceManager::updateFence(const Fence &fence)
     }
 }
 
+void FenceManager::renameFence(const QString &id, const QString &title)
+{
+    for (int i = 0; i < m_fences.size(); ++i) {
+        if (m_fences[i].id == id) {
+            m_fences[i].title = title;
+            Q_EMIT fenceUpdated(i);
+            save();
+            return;
+        }
+    }
+}
+
+void FenceManager::moveFence(const QString &id, int x, int y)
+{
+    for (int i = 0; i < m_fences.size(); ++i) {
+        if (m_fences[i].id == id) {
+            m_fences[i].x = x;
+            m_fences[i].y = y;
+            Q_EMIT fenceUpdated(i);
+            save();
+            return;
+        }
+    }
+}
+
+void FenceManager::resizeFence(const QString &id, int x, int y, int width, int height)
+{
+    for (int i = 0; i < m_fences.size(); ++i) {
+        if (m_fences[i].id == id) {
+            m_fences[i].x = x;
+            m_fences[i].y = y;
+            m_fences[i].width = width;
+            m_fences[i].height = height;
+            Q_EMIT fenceUpdated(i);
+            save();
+            return;
+        }
+    }
+}
+
+void FenceManager::setRolledUp(const QString &id, bool rolledUp)
+{
+    for (int i = 0; i < m_fences.size(); ++i) {
+        if (m_fences[i].id == id) {
+            m_fences[i].rolledUp = rolledUp;
+            Q_EMIT fenceUpdated(i);
+            save();
+            return;
+        }
+    }
+}
+
 QString FenceManager::fenceDirectory(const QString &fenceId) const
 {
     return m_basePath + QStringLiteral("/fences/") + fenceId;

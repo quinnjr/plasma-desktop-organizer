@@ -2,5 +2,7 @@
 <RCC version="1.0">
     <qresource prefix="/qml">
         <file alias="main.qml">main.qml</file>
+        <file alias="FenceContainer.qml">FenceContainer.qml</file>
+        <file alias="FenceTitleBar.qml">FenceTitleBar.qml</file>
     </qresource>
 </RCC>
