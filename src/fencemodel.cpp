@@ -13,6 +13,9 @@ FenceModel::FenceModel(FenceManager *mgr, QObject *parent)
         beginRemoveRows(QModelIndex(), index, index);
         endRemoveRows();
     });
+    // fenceUpdated triggers dataChanged here; setData() relies on this
+    // connection to satisfy the QAbstractItemModel contract — do not
+    // remove this connect() without updating setData() accordingly.
     connect(mgr, &FenceManager::fenceUpdated, this, [this](int index) {
         const QModelIndex mi = this->index(index);
         Q_EMIT dataChanged(mi, mi);

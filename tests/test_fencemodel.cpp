@@ -16,7 +16,6 @@ private Q_SLOTS:
         // QAbstractItemModelTester runs all Qt model invariant checks
         QAbstractItemModelTester tester(&model,
             QAbstractItemModelTester::FailureReportingMode::Fatal);
-        QVERIFY(true);
     }
 
     void rowCountMatchesFences() {
@@ -49,6 +48,8 @@ private Q_SLOTS:
         QCOMPARE(model.data(idx, FenceModel::WidthRole).toInt(), 500);
         QCOMPARE(model.data(idx, FenceModel::HeightRole).toInt(), 250);
         QCOMPARE(model.data(idx, FenceModel::FenceIdRole).toString(), f.id);
+        QCOMPARE(model.data(idx, FenceModel::RolledUpRole).toBool(), false);
+        QCOMPARE(model.data(idx, FenceModel::IconSizeRole).toInt(), 64);
     }
 
     void removeFenceUpdatesModel() {
