@@ -29,6 +29,7 @@ add_library(organizer_core STATIC
     src/fencemanager.cpp
     src/fencemodel.cpp
     src/fencefilemodel.cpp
+    src/layershellwindow.cpp
 )
 target_include_directories(organizer_core PUBLIC src)
 target_compile_definitions(organizer_core PRIVATE
@@ -37,16 +38,21 @@ target_compile_definitions(organizer_core PRIVATE
 target_link_libraries(organizer_core PUBLIC
     Qt6::Core
     Qt6::Gui
+    Qt6::Quick
     KF6::CoreAddons
 )
 target_link_libraries(organizer_core PRIVATE
     KF6::KIOCore
     KF6::IconThemes
     KF6::ConfigCore
+    LayerShellQt::Interface
 )
+
+qt_add_resources(QML_RESOURCES qml/qml.qrc)
 
 add_executable(plasma-organizer
     src/main.cpp
+    ${QML_RESOURCES}
 )
 target_link_libraries(plasma-organizer PRIVATE
     organizer_core
