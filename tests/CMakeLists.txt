@@ -8,6 +8,7 @@ function(add_organizer_test name)
         Qt6::Core
         KF6::CoreAddons
         KF6::KIOCore
+        KF6::IconThemes
         organizer_core
     )
     add_test(NAME ${name} COMMAND ${name})
@@ -15,3 +16,4 @@ endfunction()
 
 add_organizer_test(test_fencemanager)
 add_organizer_test(test_fencemodel)
+add_organizer_test(test_fencefilemodel)

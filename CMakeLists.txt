@@ -28,6 +28,7 @@ add_library(organizer_core STATIC
     src/application.cpp
     src/fencemanager.cpp
     src/fencemodel.cpp
+    src/fencefilemodel.cpp
 )
 target_include_directories(organizer_core PUBLIC src)
 target_compile_definitions(organizer_core PRIVATE
@@ -40,6 +41,8 @@ target_link_libraries(organizer_core PUBLIC
 )
 target_link_libraries(organizer_core PRIVATE
     KF6::KIOCore
+    KF6::IconThemes
+    KF6::ConfigCore
 )
 
 add_executable(plasma-organizer
