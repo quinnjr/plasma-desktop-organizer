@@ -39,8 +39,8 @@ Item {
             onTitleEdited: function(fid, newTitle) {
                 fenceManager.renameFence(fid, newTitle);
             }
-            onRollupToggled: function(fid) {
-                fenceManager.setRolledUp(fid, !rolledUp);
+            onRollupToggled: function(fid, newRolledUp) {
+                fenceManager.setRolledUp(fid, newRolledUp);
             }
             onCloseRequested: function(fid) {
                 fenceManager.deleteFence(fid);

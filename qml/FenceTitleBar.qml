@@ -14,6 +14,10 @@ Item {
     signal closeClicked()
     signal titleEdited(string newTitle)
 
+    function startEditing() {
+        titleLabel.startEditing();
+    }
+
     height: 28
 
     Rectangle {
@@ -91,7 +95,6 @@ Item {
             visible = false;
         }
 
-        Component.onDestruction: { if (visible) commit() }
     }
 
     // Rollup + close buttons

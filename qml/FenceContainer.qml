@@ -11,14 +11,13 @@ Item {
     property real fenceOpacity: 0.85
 
     signal titleEdited(string fenceId, string newTitle)
-    signal rollupToggled(string fenceId)
+    signal rollupToggled(string fenceId, bool newRolledUp)
     signal closeRequested(string fenceId)
     signal moveFinished(string fenceId, int newX, int newY)
     signal resizeFinished(string fenceId, int newX, int newY, int newWidth, int newHeight)
-    signal activated(string fenceId)
 
     function triggerRename() {
-        titleBar.titleLabel.startEditing();
+        titleBar.startEditing();
     }
 
     // Background
@@ -48,9 +47,8 @@ Item {
             fenceContainer.moveFinished(fenceContainer.fenceId,
                                         Math.round(fenceContainer.x),
                                         Math.round(fenceContainer.y));
-            fenceContainer.activated(fenceContainer.fenceId);
         }
-        onRollupClicked: fenceContainer.rollupToggled(fenceContainer.fenceId)
+        onRollupClicked: fenceContainer.rollupToggled(fenceContainer.fenceId, !fenceContainer.rolledUp)
         onCloseClicked: fenceContainer.closeRequested(fenceContainer.fenceId)
         onTitleEdited: function(newTitle) {
             fenceContainer.titleEdited(fenceContainer.fenceId, newTitle);
@@ -77,18 +75,21 @@ Item {
         cursorShape: Qt.SizeFDiagCursor
         visible: !fenceContainer.rolledUp
 
-        property point pressPos
+        property point pressScenePos
         property size pressSize
 
         onPressed: function(mouse) {
-            pressPos = Qt.point(mouse.x, mouse.y);
+            // Capture in scene coordinates so the reference point
+            // doesn't shift as the fence grows during the drag.
+            var scene = mapToItem(null, mouse.x, mouse.y);
+            pressScenePos = Qt.point(scene.x, scene.y);
             pressSize = Qt.size(fenceContainer.width, fenceContainer.height);
-            fenceContainer.activated(fenceContainer.fenceId);
         }
         onPositionChanged: function(mouse) {
             if (pressed) {
-                var newW = Math.max(200, pressSize.width + (mouse.x - pressPos.x));
-                var newH = Math.max(150, pressSize.height + (mouse.y - pressPos.y));
+                var scene = mapToItem(null, mouse.x, mouse.y);
+                var newW = Math.max(200, pressSize.width + (scene.x - pressScenePos.x));
+                var newH = Math.max(150, pressSize.height + (scene.y - pressScenePos.y));
                 fenceContainer.width = newW;
                 fenceContainer.height = newH;
             }
