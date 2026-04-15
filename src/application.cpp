@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QAction>
-#include <QtQml/qqml.h>
+#include <QtQml>
 
 Application::Application(int &argc, char **argv)
     : QGuiApplication(argc, argv)
@@ -46,12 +46,13 @@ bool Application::init()
     auto *menu = m_tray->contextMenu();
     auto *toggleAction = menu->addAction(QStringLiteral("Hide All Fences"));
     connect(toggleAction, &QAction::triggered, this, [this, toggleAction]() {
-        static bool visible = true;
-        visible = !visible;
-        toggleAction->setText(visible ? QStringLiteral("Hide All Fences")
-                                      : QStringLiteral("Show All Fences"));
+        const bool currentlyVisible = !m_windows.isEmpty()
+                                      && m_windows.front()->isVisible();
+        const bool nextVisible = !currentlyVisible;
+        toggleAction->setText(nextVisible ? QStringLiteral("Hide All Fences")
+                                          : QStringLiteral("Show All Fences"));
         for (auto *win : m_windows) {
-            visible ? win->show() : win->hide();
+            nextVisible ? win->show() : win->hide();
         }
     });
 

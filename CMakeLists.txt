@@ -63,8 +63,6 @@ target_link_libraries(plasma-organizer PRIVATE
     Qt6::Quick
     Qt6::QuickControls2
     Qt6::Qml
-    KF6::ConfigCore
-    KF6::IconThemes
     KF6::Svg
     KF6::StatusNotifierItem
     KF6::WindowSystem
@@ -76,7 +74,7 @@ install(TARGETS plasma-organizer
 )
 
 install(FILES data/plasma-organizer.desktop
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/autostart
+    DESTINATION ${KDE_INSTALL_AUTOSTARTDIR}
 )
 
 if(BUILD_TESTING)

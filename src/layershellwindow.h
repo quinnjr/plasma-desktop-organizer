@@ -18,6 +18,7 @@ public:
     QScreen *screen() const { return m_screen; }
     void show();
     void hide();
+    bool isVisible() const { return m_view && m_view->isVisible(); }
 
 public Q_SLOTS:
     void updateInputRegion();
