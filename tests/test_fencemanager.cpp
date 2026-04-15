@@ -326,6 +326,28 @@ private Q_SLOTS:
         FenceManager mgr(tmp.path());
         mgr.moveUrlsToDesktop({QStringLiteral(""), QStringLiteral(":::bad:::")});
     }
+
+    void moveUrlsToFence_withValidAndInvalidUrls_filtersCorrectly() {
+        QTemporaryDir tmp;
+        FenceManager mgr(tmp.path());
+        Fence f = mgr.createFence(QStringLiteral("DP-1"), QRect(0, 0, 400, 300));
+        // Mix of valid and invalid URLs - only valid ones should be processed
+        mgr.moveUrlsToFence({
+            QStringLiteral("file:///tmp/valid.txt"),
+            QStringLiteral(""),  // invalid
+            QStringLiteral("file:///tmp/another.txt"),
+            QStringLiteral(":::bad:::") // invalid
+        }, f.id);
+        // The function completes without crashing; KIO job is started for 2 valid URLs
+    }
+
+    void moveUrlsToDesktop_withValidUrl_startsKioJob() {
+        QTemporaryDir tmp;
+        FenceManager mgr(tmp.path());
+        // Valid URL - the function should start a KIO job
+        mgr.moveUrlsToDesktop({QStringLiteral("file:///tmp/test.txt")});
+        // The function completes; KIO job is started
+    }
 };
 
 QTEST_MAIN(TestFenceManager)

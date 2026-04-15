@@ -89,19 +89,32 @@ endif()
 if(BUILD_COVERAGE)
     find_program(LCOV_BIN lcov REQUIRED)
     find_program(GENHTML_BIN genhtml REQUIRED)
+    # When building with clang, gcov is the GCC tool which cannot read clang's
+    # gcno/gcda files.  Use llvm-cov as a drop-in gcov replacement via a thin
+    # wrapper script so that lcov's --gcov-tool flag works (it must be a single
+    # executable path, not "llvm-cov gcov").
+    set(LLVM_GCOV_WRAPPER ${CMAKE_SOURCE_DIR}/cmake/llvm-gcov.sh)
     add_custom_target(coverage
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>
+        # Step 1: capture raw coverage data
         COMMAND ${LCOV_BIN}
                 --capture
-                --ignore-errors mismatch,source
+                --gcov-tool ${LLVM_GCOV_WRAPPER}
+                --ignore-errors mismatch,source,path,gcov,inconsistent,unsupported
                 --directory ${CMAKE_BINARY_DIR}
+                --output-file ${CMAKE_BINARY_DIR}/coverage.raw.info
+        # Step 2: remove unwanted paths using --remove (patterns are not
+        # shell-glob-expanded; lcov treats them as fnmatch patterns)
+        COMMAND ${LCOV_BIN}
+                --remove ${CMAKE_BINARY_DIR}/coverage.raw.info
+                --ignore-errors mismatch,source,unused
                 --output-file ${CMAKE_BINARY_DIR}/coverage.info
-                --exclude "${CMAKE_BINARY_DIR}/*"
-                --exclude "*/tests/*"
-                --exclude "/usr/*"
-                --exclude "*/application.cpp"
-                --exclude "*/layershellwindow.cpp"
-                --exclude "*/main.cpp"
+                "${CMAKE_BINARY_DIR}/*"
+                "*/tests/*"
+                "/usr/*"
+                "*/application.cpp"
+                "*/layershellwindow.cpp"
+                "*/main.cpp"
         COMMAND ${GENHTML_BIN}
                 ${CMAKE_BINARY_DIR}/coverage.info
                 --output-directory ${CMAKE_BINARY_DIR}/coverage_html
