@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Plasma Desktop Organizer
+Comment=Fences-style desktop organizer for KDE Plasma
+Exec=plasma-organizer
+Icon=view-split-left-right
+Categories=Utility;
+X-KDE-autostart-enabled=true
+X-KDE-StartupNotify=false

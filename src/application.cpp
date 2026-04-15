@@ -5,6 +5,8 @@
 
 #include <QScreen>
 #include <QDebug>
+#include <QMenu>
+#include <QAction>
 #include <QtQml/qqml.h>
 
 Application::Application(int &argc, char **argv)
@@ -32,6 +34,29 @@ bool Application::init()
             this, &Application::onScreenAdded);
     connect(this, &QGuiApplication::screenRemoved,
             this, &Application::onScreenRemoved);
+
+    m_tray = new KStatusNotifierItem(this);
+    m_tray->setIconByName(QStringLiteral("view-split-left-right"));
+    m_tray->setTitle(QStringLiteral("Desktop Organizer"));
+    m_tray->setToolTip(QStringLiteral("view-split-left-right"),
+                       QStringLiteral("Desktop Organizer"),
+                       QStringLiteral("Fences-style desktop organizer"));
+    m_tray->setStatus(KStatusNotifierItem::Active);
+
+    auto *menu = m_tray->contextMenu();
+    auto *toggleAction = menu->addAction(QStringLiteral("Hide All Fences"));
+    connect(toggleAction, &QAction::triggered, this, [this, toggleAction]() {
+        static bool visible = true;
+        visible = !visible;
+        toggleAction->setText(visible ? QStringLiteral("Hide All Fences")
+                                      : QStringLiteral("Show All Fences"));
+        for (auto *win : m_windows) {
+            visible ? win->show() : win->hide();
+        }
+    });
+
+    auto *quitAction = menu->addAction(QStringLiteral("Quit"));
+    connect(quitAction, &QAction::triggered, this, &QGuiApplication::quit);
 
     return true;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <QGuiApplication>
 #include <QList>
+#include <KStatusNotifierItem>
 
 class FenceManager;
 class LayerShellWindow;
@@ -22,4 +23,5 @@ private:
 
     FenceManager *m_mgr = nullptr;
     QList<LayerShellWindow *> m_windows;
+    KStatusNotifierItem *m_tray = nullptr;
 };

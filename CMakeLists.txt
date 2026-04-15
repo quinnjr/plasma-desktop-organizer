@@ -45,6 +45,7 @@ target_link_libraries(organizer_core PRIVATE
     KF6::KIOCore
     KF6::IconThemes
     KF6::ConfigCore
+    KF6::StatusNotifierItem
     Qt6::Qml
     LayerShellQt::Interface
 )
@@ -72,6 +73,10 @@ target_link_libraries(plasma-organizer PRIVATE
 
 install(TARGETS plasma-organizer
     DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(FILES data/plasma-organizer.desktop
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/autostart
 )
 
 if(BUILD_TESTING)
