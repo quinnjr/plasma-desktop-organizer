@@ -41,7 +41,7 @@ private Q_SLOTS:
         QSignalSpy spy(&model, &FenceFileModel::rowsInserted);
 
         QFile f(tmp.path() + QStringLiteral("/test.txt"));
-        f.open(QIODevice::WriteOnly);
+        QVERIFY(f.open(QIODevice::WriteOnly));
         f.write("hello");
         f.close();
 
@@ -52,7 +52,7 @@ private Q_SLOTS:
     void filenameRoleReturnsName() {
         QTemporaryDir tmp;
         QFile f(tmp.path() + QStringLiteral("/readme.txt"));
-        f.open(QIODevice::WriteOnly); f.write("x"); f.close();
+        QVERIFY(f.open(QIODevice::WriteOnly)); f.write("x"); f.close();
 
         FenceFileModel model(tmp.path());
 
@@ -68,7 +68,7 @@ private Q_SLOTS:
         // FenceFileModel is a flat list; any child query must return 0.
         QTemporaryDir tmp;
         QFile f(tmp.path() + QStringLiteral("/a.txt"));
-        f.open(QIODevice::WriteOnly); f.write("x"); f.close();
+        QVERIFY(f.open(QIODevice::WriteOnly)); f.write("x"); f.close();
 
         FenceFileModel model(tmp.path());
         QCOMPARE(model.rowCount(), 1);
@@ -86,7 +86,7 @@ private Q_SLOTS:
     void data_fileUrlRole_returnsAbsoluteFileUrl() {
         QTemporaryDir tmp;
         QFile f(tmp.path() + QStringLiteral("/hello.txt"));
-        f.open(QIODevice::WriteOnly); f.write("x"); f.close();
+        QVERIFY(f.open(QIODevice::WriteOnly)); f.write("x"); f.close();
 
         FenceFileModel model(tmp.path());
         QCOMPARE(model.rowCount(), 1);
@@ -100,7 +100,7 @@ private Q_SLOTS:
     void data_isDirRole_falseForRegularFile() {
         QTemporaryDir tmp;
         QFile f(tmp.path() + QStringLiteral("/test.txt"));
-        f.open(QIODevice::WriteOnly); f.write("x"); f.close();
+        QVERIFY(f.open(QIODevice::WriteOnly)); f.write("x"); f.close();
 
         FenceFileModel model(tmp.path());
         QVERIFY(!model.data(model.index(0), FenceFileModel::IsDirRole).toBool());
@@ -118,7 +118,7 @@ private Q_SLOTS:
     void data_displayNameRole_nonDesktop_returnsFilename() {
         QTemporaryDir tmp;
         QFile f(tmp.path() + QStringLiteral("/notes.txt"));
-        f.open(QIODevice::WriteOnly); f.write("x"); f.close();
+        QVERIFY(f.open(QIODevice::WriteOnly)); f.write("x"); f.close();
 
         FenceFileModel model(tmp.path());
         QCOMPARE(
@@ -129,7 +129,7 @@ private Q_SLOTS:
     void data_displayRole_returnsDisplayName() {
         QTemporaryDir tmp;
         QFile f(tmp.path() + QStringLiteral("/notes.txt"));
-        f.open(QIODevice::WriteOnly); f.write("x"); f.close();
+        QVERIFY(f.open(QIODevice::WriteOnly)); f.write("x"); f.close();
 
         FenceFileModel model(tmp.path());
         QCOMPARE(
