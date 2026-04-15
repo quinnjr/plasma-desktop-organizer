@@ -4,5 +4,7 @@
         <file alias="main.qml">main.qml</file>
         <file alias="FenceContainer.qml">FenceContainer.qml</file>
         <file alias="FenceTitleBar.qml">FenceTitleBar.qml</file>
+        <file alias="FenceIconGrid.qml">FenceIconGrid.qml</file>
+        <file alias="DesktopIcon.qml">DesktopIcon.qml</file>
     </qresource>
 </RCC>

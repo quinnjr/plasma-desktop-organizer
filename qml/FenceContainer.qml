@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import dev.quinnjr.organizer 1.0
 
 Item {
     id: fenceContainer
@@ -10,11 +11,18 @@ Item {
     property int iconSize: 64
     property real fenceOpacity: 0.85
 
+    property string selectedUrl: ""
+
     signal titleEdited(string fenceId, string newTitle)
     signal rollupToggled(string fenceId, bool newRolledUp)
     signal closeRequested(string fenceId)
     signal moveFinished(string fenceId, int newX, int newY)
     signal resizeFinished(string fenceId, int newX, int newY, int newWidth, int newHeight)
+    signal iconClicked(string fenceId, string url, var mouse)
+    signal iconDoubleClicked(string fenceId, string url)
+    signal iconDragStarted(string fenceId, string url)
+    signal iconDragMoved(string fenceId, string url, real sceneX, real sceneY)
+    signal iconDragEnded(string fenceId, string url, real sceneX, real sceneY)
 
     function triggerRename() {
         titleBar.startEditing();
@@ -28,6 +36,11 @@ Item {
         radius: 6
         border.color: "#556666aa"
         border.width: 1
+    }
+
+    FenceFileModel {
+        id: fenceFiles
+        directory: fenceContainer.fenceId !== "" ? fenceManager.fenceDirectory(fenceContainer.fenceId) : ""
     }
 
     FenceTitleBar {
@@ -64,6 +77,29 @@ Item {
         anchors.bottom: parent.bottom
         visible: !fenceContainer.rolledUp
         clip: true
+
+        FenceIconGrid {
+            anchors.fill: parent
+            fileModel: fenceFiles
+            iconSize: fenceContainer.iconSize
+            selectedUrl: fenceContainer.selectedUrl
+
+            onIconClicked: function(url, mouse) {
+                fenceContainer.iconClicked(fenceContainer.fenceId, url, mouse);
+            }
+            onIconDoubleClicked: function(url) {
+                fenceContainer.iconDoubleClicked(fenceContainer.fenceId, url);
+            }
+            onIconDragStarted: function(url) {
+                fenceContainer.iconDragStarted(fenceContainer.fenceId, url);
+            }
+            onIconDragMoved: function(url, sx, sy) {
+                fenceContainer.iconDragMoved(fenceContainer.fenceId, url, sx, sy);
+            }
+            onIconDragEnded: function(url, sx, sy) {
+                fenceContainer.iconDragEnded(fenceContainer.fenceId, url, sx, sy);
+            }
+        }
     }
 
     // Resize handle (bottom-right corner)

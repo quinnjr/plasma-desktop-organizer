@@ -4,6 +4,11 @@
 #include <QFileInfo>
 #include <KDesktopFile>
 
+FenceFileModel::FenceFileModel(QObject *parent)
+    : FenceFileModel(QString(), parent)
+{
+}
+
 FenceFileModel::FenceFileModel(const QString &directory, QObject *parent)
     : QAbstractListModel(parent)
     , m_directory(directory)
@@ -30,6 +35,7 @@ void FenceFileModel::setDirectory(const QString &directory)
         m_watch->removeDir(m_directory);
     }
     m_directory = directory;
+    Q_EMIT directoryChanged();
     if (!m_directory.isEmpty()) {
         m_watch->addDir(m_directory, KDirWatch::WatchFiles);
         refresh();

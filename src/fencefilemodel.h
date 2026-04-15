@@ -8,6 +8,7 @@
 
 class FenceFileModel : public QAbstractListModel {
     Q_OBJECT
+    Q_PROPERTY(QString directory READ directory WRITE setDirectory NOTIFY directoryChanged)
 public:
     enum Roles {
         FileNameRole = Qt::UserRole + 1,
@@ -17,6 +18,7 @@ public:
         IsDirRole,
     };
 
+    explicit FenceFileModel(QObject *parent = nullptr);
     explicit FenceFileModel(const QString &directory, QObject *parent = nullptr);
     ~FenceFileModel() override;
 
@@ -26,6 +28,9 @@ public:
 
     QString directory() const { return m_directory; }
     void setDirectory(const QString &directory);
+
+Q_SIGNALS:
+    void directoryChanged();
 
 private Q_SLOTS:
     void onDirty(const QString &path);

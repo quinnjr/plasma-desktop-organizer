@@ -1,9 +1,11 @@
 #include "application.h"
+#include "fencefilemodel.h"
 #include "fencemanager.h"
 #include "layershellwindow.h"
 
 #include <QScreen>
 #include <QDebug>
+#include <QtQml/qqml.h>
 
 Application::Application(int &argc, char **argv)
     : QGuiApplication(argc, argv)
@@ -17,6 +19,8 @@ Application::~Application() = default;
 
 bool Application::init()
 {
+    qmlRegisterType<FenceFileModel>("dev.quinnjr.organizer", 1, 0, "FenceFileModel");
+
     m_mgr = new FenceManager(QString(), this);
     m_mgr->load();
 

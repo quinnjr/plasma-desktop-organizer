@@ -12,7 +12,7 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 Qml)
 find_package(KF6 REQUIRED COMPONENTS
     CoreAddons
     Config
@@ -60,6 +60,7 @@ target_link_libraries(plasma-organizer PRIVATE
     Qt6::Gui
     Qt6::Quick
     Qt6::QuickControls2
+    Qt6::Qml
     KF6::ConfigCore
     KF6::IconThemes
     KF6::Svg

@@ -6,6 +6,7 @@ Item {
     anchors.fill: parent
 
     property bool fencesVisible: true
+    property string selectedUrl: ""
 
     Repeater {
         id: fenceRepeater
@@ -50,6 +51,15 @@ Item {
             }
             onResizeFinished: function(fid, nx, ny, nw, nh) {
                 fenceManager.resizeFence(fid, nx, ny, nw, nh);
+            }
+
+            selectedUrl: root.selectedUrl
+
+            onIconClicked: function(fid, url, mouse) {
+                root.selectedUrl = url;
+            }
+            onIconDoubleClicked: function(fid, url) {
+                Qt.openUrlExternally(url);
             }
         }
     }
