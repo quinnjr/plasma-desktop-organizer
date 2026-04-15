@@ -19,6 +19,9 @@ public:
     void show();
     void hide();
 
+public Q_SLOTS:
+    void updateInputRegion();
+
 private:
     void setupLayerShell();
 

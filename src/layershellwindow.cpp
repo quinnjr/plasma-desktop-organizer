@@ -1,9 +1,11 @@
 #include "layershellwindow.h"
 #include "fencemanager.h"
 #include "fencemodel.h"
+#include "fence.h"
 
 #include <QQmlContext>
 #include <QDebug>
+#include <QRegion>
 #include <LayerShellQt/Window>
 
 LayerShellWindow::LayerShellWindow(QScreen *screen,
@@ -32,6 +34,11 @@ LayerShellWindow::LayerShellWindow(QScreen *screen,
     m_view->setSource(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
     setupLayerShell();
+
+    connect(m_mgr, &FenceManager::fenceAdded,   this, &LayerShellWindow::updateInputRegion);
+    connect(m_mgr, &FenceManager::fenceRemoved, this, &LayerShellWindow::updateInputRegion);
+    connect(m_mgr, &FenceManager::fenceUpdated, this, &LayerShellWindow::updateInputRegion);
+    updateInputRegion();
 }
 
 LayerShellWindow::~LayerShellWindow() = default;
@@ -57,6 +64,20 @@ void LayerShellWindow::setupLayerShell()
     layerShell->setExclusiveZone(-1);
     layerShell->setKeyboardInteractivity(
         LayerShellQt::Window::KeyboardInteractivityOnDemand);
+}
+
+void LayerShellWindow::updateInputRegion()
+{
+    QRegion region;
+    const QString myScreen = m_screen->name();
+
+    for (const Fence &f : m_mgr->fences()) {
+        if (f.screen != myScreen) continue;
+        const int height = f.rolledUp ? 28 : f.height;
+        region += QRect(f.x, f.y, f.width, height);
+    }
+
+    m_view->setMask(region);
 }
 
 void LayerShellWindow::show()

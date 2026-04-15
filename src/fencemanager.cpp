@@ -58,6 +58,15 @@ Fence FenceManager::createFence(const QString &screen,
     return f;
 }
 
+QString FenceManager::createFenceOnScreen(const QString &screen,
+                                           int x, int y, int w, int h,
+                                           const QString &title)
+{
+    Fence f = createFence(screen, QRect(x, y, w, h), title);
+    save();
+    return f.id;
+}
+
 void FenceManager::deleteFence(const QString &id)
 {
     for (int i = 0; i < m_fences.size(); ++i) {
