@@ -16,6 +16,8 @@ Item {
     signal iconClicked(string url, var mouse)
     signal iconDoubleClicked(string url)
     signal iconDragStarted(string url)
+    signal iconDragMoved(string url, real sceneX, real sceneY)
+    signal iconDragEnded(string url, real sceneX, real sceneY)
 
     clip: true
 
@@ -64,6 +66,12 @@ Item {
                     }
                     onDragStarted: {
                         gridRoot.iconDragStarted(fileUrl);
+                    }
+                    onDragMoved: function(sx, sy) {
+                        gridRoot.iconDragMoved(fileUrl, sx, sy);
+                    }
+                    onDragEnded: function(sx, sy) {
+                        gridRoot.iconDragEnded(fileUrl, sx, sy);
                     }
                 }
             }

@@ -38,7 +38,7 @@ ContainmentItem {
         model: desktopFolderModel
         delegate: QtObject {
             required property string fileName
-            required property url fileURL
+            required property url fileUrl
             required property bool fileIsDir
         }
         onObjectAdded: rebuildTimer.restart()
@@ -57,7 +57,7 @@ ContainmentItem {
             var obj = fileInstantiator.objectAt(i);
             if (obj) {
                 files.push({
-                    url: obj.fileURL.toString(),
+                    url: obj.fileUrl.toString(),
                     fileName: obj.fileName,
                     isDir: obj.fileIsDir
                 });
@@ -157,6 +157,8 @@ ContainmentItem {
                 }
                 onDoubleClicked: Qt.openUrlExternally(fileUrl)
                 onDragStarted: root.beginIconDrag(fileUrl, "")
+                onDragMoved: function(sx, sy) { root.updateIconDrag(sx, sy) }
+                onDragEnded: function(sx, sy) { root.endIconDrag(sx, sy) }
             }
         }
     }
@@ -195,7 +197,7 @@ ContainmentItem {
                 NumberAnimation { duration: Plasmoid.configuration.animationSpeed; easing.type: Easing.InOutQuad }
             }
 
-            onTitleChanged: function(fid, newTitle) {
+            onTitleEdited: function(fid, newTitle) {
                 var f = FenceModel.findFence(root.fences, fid);
                 if (f) f.title = newTitle;
                 root.persistFences();
@@ -234,6 +236,12 @@ ContainmentItem {
             onIconDragStarted: function(fid, url) {
                 root.beginIconDrag(url, fid);
             }
+            onIconDragMoved: function(fid, url, sx, sy) {
+                root.updateIconDrag(sx, sy);
+            }
+            onIconDragEnded: function(fid, url, sx, sy) {
+                root.endIconDrag(sx, sy);
+            }
             onActivated: function(fid) {
                 root.maxZ++;
                 z = root.maxZ;
@@ -256,8 +264,15 @@ ContainmentItem {
         isDraggingIcon = true;
     }
 
-    function finishIconDrop(dropX, dropY) {
-        var targetFence = hitTestFence(dropX, dropY);
+    function updateIconDrag(sceneX, sceneY) {
+        var local = root.mapFromItem(null, sceneX, sceneY);
+        dragProxy.x = local.x - 24;
+        dragProxy.y = local.y - 24;
+    }
+
+    function endIconDrag(sceneX, sceneY) {
+        var local = root.mapFromItem(null, sceneX, sceneY);
+        var targetFence = hitTestFence(local.x, local.y);
         FenceModel.unassignIconFromAll(fences, dragIconUrl);
 
         if (targetFence) {
@@ -292,24 +307,6 @@ ContainmentItem {
         }
     }
 
-    // Drag overlay (captures all mouse events during icon drag)
-    MouseArea {
-        id: dragOverlay
-        anchors.fill: parent
-        z: 10000
-        visible: root.isDraggingIcon
-        cursorShape: Qt.ClosedHandCursor
-
-        onPositionChanged: function(mouse) {
-            dragProxy.x = mouse.x - 24;
-            dragProxy.y = mouse.y - 24;
-        }
-
-        onReleased: function(mouse) {
-            root.finishIconDrop(mouse.x, mouse.y);
-        }
-    }
-
     SelectionRectangle {
         id: selectionRect
         z: 9999
@@ -326,6 +323,7 @@ ContainmentItem {
         property point pressPos
 
         onPressed: function(mouse) {
+            console.log("DESKTOP PRESSED at", mouse.x, mouse.y, "root size:", root.width, root.height, "flow size:", unfencedFlow.width, unfencedFlow.height, "icons:", unfencedFlow.children.length);
             pressPos = Qt.point(mouse.x, mouse.y);
             drawing = false;
 

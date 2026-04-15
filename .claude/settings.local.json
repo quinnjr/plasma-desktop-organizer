@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kpackagetool6:*)",
+      "Bash(journalctl --user -u plasma-plasmashell -n 50 --no-pager)",
+      "Bash(journalctl --user -b -g \"qml|desktoporganizer|quinnjr\" --no-pager -n 50)",
+      "Bash(QT_LOGGING_RULES=\"*.debug=true\" timeout 5 plasmashell --replace)",
+      "Bash(journalctl:*)",
+      "Bash(spectacle -b -f -o /tmp/desktop-screenshot2.png)",
+      "Bash(snap list:*)",
+      "Bash(sudo snap:*)"
+    ]
+  }
+}

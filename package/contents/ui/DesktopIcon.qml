@@ -20,6 +20,8 @@ Item {
     signal clicked(var mouse)
     signal doubleClicked(var mouse)
     signal dragStarted()
+    signal dragMoved(real sceneX, real sceneY)
+    signal dragEnded(real sceneX, real sceneY)
 
     width: iconSize + 16
     height: iconSize + labelText.implicitHeight + 12
@@ -75,6 +77,7 @@ Item {
         property bool wasDragged: false
 
         onPressed: function(mouse) {
+            console.log("ICON PRESSED:", iconRoot.fileName, "at", mouse.x, mouse.y, "size:", iconRoot.width, iconRoot.height);
             pressPos = Qt.point(mouse.x, mouse.y);
             wasDragged = false;
         }
@@ -87,6 +90,17 @@ Item {
                     wasDragged = true;
                     iconRoot.dragStarted();
                 }
+            }
+            if (wasDragged && pressed) {
+                var sp = mouseArea.mapToItem(null, mouse.x, mouse.y);
+                iconRoot.dragMoved(sp.x, sp.y);
+            }
+        }
+
+        onReleased: function(mouse) {
+            if (wasDragged) {
+                var sp = mouseArea.mapToItem(null, mouse.x, mouse.y);
+                iconRoot.dragEnded(sp.x, sp.y);
             }
         }
 

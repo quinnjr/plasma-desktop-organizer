@@ -93,10 +93,10 @@ Item {
         onPressed: function(mouse) {
             if (mouse.button === Qt.LeftButton) {
                 root.selectedUrl = "";
+                root.isDrawing = false;
                 root.drawStart = Qt.point(mouse.x, mouse.y);
                 root.drawCurrent = Qt.point(mouse.x, mouse.y);
-            }
-            if (mouse.button === Qt.RightButton) {
+            } else if (mouse.button === Qt.RightButton) {
                 desktopMenu.popup();
             }
         }

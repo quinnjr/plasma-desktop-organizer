@@ -20,16 +20,18 @@ Item {
     property real fenceOpacity: 0.8
     property int animationSpeed: 200
 
-    signal titleChanged(string fenceId, string newTitle)
+    signal titleEdited(string fenceId, string newTitle)
     signal rollupToggled(string fenceId)
     signal closeRequested(string fenceId)
-    signal positionChanged(string fenceId, real newX, real newY)
+    signal positionMoved(string fenceId, real newX, real newY)
     signal moveFinished(string fenceId)
-    signal sizeChanged(string fenceId, real newX, real newY, real newW, real newH)
+    signal sizeEdited(string fenceId, real newX, real newY, real newW, real newH)
     signal resizeFinished(string fenceId)
     signal iconClicked(string fenceId, string url, var mouse)
     signal iconDoubleClicked(string fenceId, string url)
     signal iconDragStarted(string fenceId, string url)
+    signal iconDragMoved(string fenceId, string url, real sceneX, real sceneY)
+    signal iconDragEnded(string fenceId, string url, real sceneX, real sceneY)
     signal activated(string fenceId)
     signal contextMenuRequested(string fenceId)
 
@@ -78,15 +80,15 @@ Item {
         title: fence.title
         rolledUp: fence.rolledUp
 
-        onTitleChanged: function(newTitle) {
-            fence.titleChanged(fence.fenceId, newTitle);
+        onTitleEdited: function(newTitle) {
+            fence.titleEdited(fence.fenceId, newTitle);
         }
         onRollupToggled: fence.rollupToggled(fence.fenceId)
         onCloseClicked: fence.closeRequested(fence.fenceId)
         onDragBy: function(dx, dy) {
             fence.x += dx;
             fence.y += dy;
-            fence.positionChanged(fence.fenceId, fence.x, fence.y);
+            fence.positionMoved(fence.fenceId, fence.x, fence.y);
         }
         onDragFinished: fence.moveFinished(fence.fenceId)
     }
@@ -113,6 +115,12 @@ Item {
         }
         onIconDragStarted: function(url) {
             fence.iconDragStarted(fence.fenceId, url);
+        }
+        onIconDragMoved: function(url, sx, sy) {
+            fence.iconDragMoved(fence.fenceId, url, sx, sy);
+        }
+        onIconDragEnded: function(url, sx, sy) {
+            fence.iconDragEnded(fence.fenceId, url, sx, sy);
         }
     }
 
@@ -181,7 +189,7 @@ Item {
         fence.width = newW;
         fence.height = newH;
         fence.expandedHeight = newH;
-        fence.sizeChanged(fence.fenceId, newX, newY, newW, newH);
+        fence.sizeEdited(fence.fenceId, newX, newY, newW, newH);
     }
 
     function triggerRename() {

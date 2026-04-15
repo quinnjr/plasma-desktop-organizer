@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include <QUuid>
 #include <QDebug>
+#include <QtGlobal>
 
 FenceManager *FenceManager::s_instance = nullptr;
 
@@ -62,7 +63,7 @@ QString FenceManager::createFenceOnScreen(const QString &screen,
                                            int x, int y, int w, int h,
                                            const QString &title)
 {
-    Fence f = createFence(screen, QRect(x, y, w, h), title);
+    Fence f = createFence(screen, QRect(x, y, qMax(1, w), qMax(1, h)), title);
     save();
     return f.id;
 }

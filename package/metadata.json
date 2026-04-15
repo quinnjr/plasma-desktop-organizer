@@ -10,7 +10,7 @@
         "Description": "Organize desktop icons into labeled, resizable fence containers",
         "EnabledByDefault": true,
         "Icon": "preferences-desktop-icons",
-        "Id": "org.kde.plasma.desktoporganizer",
+        "Id": "dev.quinnjr.desktoporganizer",
         "License": "GPL-2.0-or-later",
         "Name": "Desktop Organizer"
     },

@@ -9,7 +9,7 @@ Item {
     required property string title
     required property bool rolledUp
 
-    signal titleChanged(string newTitle)
+    signal titleEdited(string newTitle)
     signal rollupToggled()
     signal closeClicked()
     signal dragBy(real deltaX, real deltaY)
@@ -53,7 +53,7 @@ Item {
 
                 onAccepted: {
                     if (text.trim() !== "") {
-                        titleBar.titleChanged(text.trim());
+                        titleBar.titleEdited(text.trim());
                     }
                     visible = false;
                 }
