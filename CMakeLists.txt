@@ -58,9 +58,6 @@ add_executable(plasma-organizer
 )
 target_link_libraries(plasma-organizer PRIVATE
     organizer_core
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Quick
     Qt6::QuickControls2
     Qt6::Qml
     KF6::Svg
