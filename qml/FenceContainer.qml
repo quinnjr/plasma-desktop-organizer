@@ -78,26 +78,44 @@ Item {
         visible: !fenceContainer.rolledUp
         clip: true
 
-        FenceIconGrid {
+        DropArea {
             anchors.fill: parent
-            fileModel: fenceFiles
-            iconSize: fenceContainer.iconSize
-            selectedUrl: fenceContainer.selectedUrl
+            keys: ["text/uri-list"]
 
-            onIconClicked: function(url, mouse) {
-                fenceContainer.iconClicked(fenceContainer.fenceId, url, mouse);
+            onDropped: function(drop) {
+                if (drop.hasUrls) {
+                    var urls = drop.urls.map(function(u) { return u.toString(); });
+                    fenceManager.moveUrlsToFence(urls, fenceContainer.fenceId);
+                    drop.accept(Qt.MoveAction);
+                }
             }
-            onIconDoubleClicked: function(url) {
-                fenceContainer.iconDoubleClicked(fenceContainer.fenceId, url);
-            }
-            onIconDragStarted: function(url) {
-                fenceContainer.iconDragStarted(fenceContainer.fenceId, url);
-            }
-            onIconDragMoved: function(url, sx, sy) {
-                fenceContainer.iconDragMoved(fenceContainer.fenceId, url, sx, sy);
-            }
-            onIconDragEnded: function(url, sx, sy) {
-                fenceContainer.iconDragEnded(fenceContainer.fenceId, url, sx, sy);
+
+            FenceIconGrid {
+                anchors.fill: parent
+                fileModel: fenceFiles
+                iconSize: fenceContainer.iconSize
+                selectedUrl: fenceContainer.selectedUrl
+
+                onIconClicked: function(url, mouse) {
+                    if (mouse.button === Qt.RightButton) {
+                        iconContextMenu.targetUrl = url;
+                        iconContextMenu.popup();
+                    } else {
+                        fenceContainer.iconClicked(fenceContainer.fenceId, url, mouse);
+                    }
+                }
+                onIconDoubleClicked: function(url) {
+                    fenceContainer.iconDoubleClicked(fenceContainer.fenceId, url);
+                }
+                onIconDragStarted: function(url) {
+                    fenceContainer.iconDragStarted(fenceContainer.fenceId, url);
+                }
+                onIconDragMoved: function(url, sx, sy) {
+                    fenceContainer.iconDragMoved(fenceContainer.fenceId, url, sx, sy);
+                }
+                onIconDragEnded: function(url, sx, sy) {
+                    fenceContainer.iconDragEnded(fenceContainer.fenceId, url, sx, sy);
+                }
             }
         }
     }
@@ -147,5 +165,21 @@ Item {
 
     Behavior on height {
         NumberAnimation { duration: 150; easing.type: Easing.InOutQuad }
+    }
+
+    Menu {
+        id: iconContextMenu
+        property string targetUrl: ""
+
+        MenuItem {
+            text: "Open"
+            onTriggered: Qt.openUrlExternally(iconContextMenu.targetUrl)
+        }
+        MenuItem {
+            text: "Remove from Fence"
+            onTriggered: {
+                fenceManager.moveUrlsToDesktop([iconContextMenu.targetUrl]);
+            }
+        }
     }
 }

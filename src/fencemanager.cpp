@@ -9,6 +9,7 @@
 #include <QUuid>
 #include <QDebug>
 #include <QtGlobal>
+#include <KIO/CopyJob>
 
 FenceManager *FenceManager::s_instance = nullptr;
 
@@ -197,6 +198,39 @@ void FenceManager::save()
     } else {
         qWarning() << "FenceManager: could not write" << m_configPath;
     }
+}
+
+void FenceManager::moveUrlsToFence(const QStringList &urls, const QString &fenceId)
+{
+    const QString destDir = fenceDirectory(fenceId);
+    if (!QDir().exists(destDir)) {
+        qWarning() << "FenceManager::moveUrlsToFence: directory does not exist:" << destDir;
+        return;
+    }
+
+    QList<QUrl> srcUrls;
+    srcUrls.reserve(urls.size());
+    for (const QString &s : urls) {
+        srcUrls.append(QUrl(s));
+    }
+
+    auto *job = KIO::move(srcUrls, QUrl::fromLocalFile(destDir));
+    job->start();
+}
+
+void FenceManager::moveUrlsToDesktop(const QStringList &urls)
+{
+    const QString desktopPath = QStandardPaths::writableLocation(
+        QStandardPaths::DesktopLocation);
+
+    QList<QUrl> srcUrls;
+    srcUrls.reserve(urls.size());
+    for (const QString &s : urls) {
+        srcUrls.append(QUrl(s));
+    }
+
+    auto *job = KIO::move(srcUrls, QUrl::fromLocalFile(desktopPath));
+    job->start();
 }
 
 QString FenceManager::defaultBasePath() const

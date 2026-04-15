@@ -18,6 +18,13 @@ Item {
     signal dragMoved(string url, real sceneX, real sceneY)
     signal dragEnded(string url, real sceneX, real sceneY)
 
+    Drag.active: mouseArea.wasDragged && mouseArea.pressed
+    Drag.dragType: Drag.Automatic
+    Drag.supportedActions: Qt.MoveAction
+    Drag.mimeData: { "text/uri-list": fileUrl + "\r\n" }
+    Drag.hotSpot.x: width / 2
+    Drag.hotSpot.y: height / 2
+
     width: iconSize + 16
     height: iconSize + labelText.implicitHeight + 12
 
