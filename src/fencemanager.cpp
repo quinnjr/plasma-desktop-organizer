@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QtGlobal>
 #include <KIO/CopyJob>
+#include <KJob>
 
 FenceManager *FenceManager::s_instance = nullptr;
 
@@ -211,10 +212,21 @@ void FenceManager::moveUrlsToFence(const QStringList &urls, const QString &fence
     QList<QUrl> srcUrls;
     srcUrls.reserve(urls.size());
     for (const QString &s : urls) {
-        srcUrls.append(QUrl(s));
+        const QUrl u(s);
+        if (u.isValid() && !u.isEmpty())
+            srcUrls.append(u);
+        else
+            qWarning() << "FenceManager::moveUrlsToFence: skipping invalid URL:" << s;
     }
+    if (srcUrls.isEmpty()) return;
 
     auto *job = KIO::move(srcUrls, QUrl::fromLocalFile(destDir));
+    // KIO jobs auto-delete; do not store or delete this pointer
+    connect(job, &KJob::result, this, [](KJob *job) {
+        if (job->error()) {
+            qWarning() << "KIO move failed:" << job->errorString();
+        }
+    });
     job->start();
 }
 
@@ -222,14 +234,29 @@ void FenceManager::moveUrlsToDesktop(const QStringList &urls)
 {
     const QString desktopPath = QStandardPaths::writableLocation(
         QStandardPaths::DesktopLocation);
+    if (desktopPath.isEmpty()) {
+        qWarning() << "FenceManager::moveUrlsToDesktop: DesktopLocation unresolvable";
+        return;
+    }
 
     QList<QUrl> srcUrls;
     srcUrls.reserve(urls.size());
     for (const QString &s : urls) {
-        srcUrls.append(QUrl(s));
+        const QUrl u(s);
+        if (u.isValid() && !u.isEmpty())
+            srcUrls.append(u);
+        else
+            qWarning() << "FenceManager::moveUrlsToDesktop: skipping invalid URL:" << s;
     }
+    if (srcUrls.isEmpty()) return;
 
     auto *job = KIO::move(srcUrls, QUrl::fromLocalFile(desktopPath));
+    // KIO jobs auto-delete; do not store or delete this pointer
+    connect(job, &KJob::result, this, [](KJob *job) {
+        if (job->error()) {
+            qWarning() << "KIO move failed:" << job->errorString();
+        }
+    });
     job->start();
 }
 

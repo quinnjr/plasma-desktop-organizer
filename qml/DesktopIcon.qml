@@ -18,10 +18,9 @@ Item {
     signal dragMoved(string url, real sceneX, real sceneY)
     signal dragEnded(string url, real sceneX, real sceneY)
 
-    Drag.active: mouseArea.wasDragged && mouseArea.pressed
     Drag.dragType: Drag.Automatic
     Drag.supportedActions: Qt.MoveAction
-    Drag.mimeData: { "text/uri-list": fileUrl + "\r\n" }
+    Drag.mimeData: ({ "text/uri-list": iconRoot.fileUrl + "\r\n" })
     Drag.hotSpot.x: width / 2
     Drag.hotSpot.y: height / 2
 
@@ -81,6 +80,7 @@ Item {
                 var dy = mouse.y - pressPos.y;
                 if (Math.sqrt(dx*dx + dy*dy) > 8) {
                     wasDragged = true;
+                    iconRoot.Drag.active = true;
                     iconRoot.dragStarted(iconRoot.fileUrl);
                 }
             }
@@ -91,6 +91,7 @@ Item {
         }
         onReleased: function(mouse) {
             if (wasDragged) {
+                iconRoot.Drag.active = false;
                 var sp = mouseArea.mapToItem(null, mouse.x, mouse.y);
                 iconRoot.dragEnded(iconRoot.fileUrl, sp.x, sp.y);
             }

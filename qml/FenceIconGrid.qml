@@ -34,23 +34,20 @@ Item {
                 model: gridRoot.fileModel
 
                 delegate: DesktopIcon {
-                    required property string fileUrl
-                    required property string fileName
-                    required property string iconName
-                    required property string displayName
+                    required property var model
 
-                    fileUrl: fileUrl
-                    fileName: fileName
-                    iconName: iconName
-                    displayName: displayName
+                    fileUrl: model.fileUrl
+                    fileName: model.fileName
+                    iconName: model.iconName
+                    displayName: model.displayName
                     iconSize: gridRoot.iconSize
-                    selected: fileUrl === gridRoot.selectedUrl
+                    selected: model.fileUrl === gridRoot.selectedUrl
 
                     onClicked: function(mouse) {
-                        gridRoot.iconClicked(fileUrl, mouse);
+                        gridRoot.iconClicked(model.fileUrl, mouse);
                     }
                     onDoubleClicked: function(mouse) {
-                        gridRoot.iconDoubleClicked(fileUrl);
+                        gridRoot.iconDoubleClicked(model.fileUrl);
                     }
                     onDragStarted: function(url) {
                         gridRoot.iconDragStarted(url);
