@@ -1,12 +1,24 @@
 #include <QtTest>
 #include <QTemporaryDir>
 #include <QFile>
+#include <QScopeGuard>
+#include <QStandardPaths>
 #include "fencemanager.h"
 
 class TestFenceManager : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
+
+    void initTestCase() {
+        // Redirect all QStandardPaths locations to ~/.qttest/ to prevent
+        // any test from accidentally touching real user data directories.
+        QStandardPaths::setTestModeEnabled(true);
+    }
+
+    void cleanupTestCase() {
+        QStandardPaths::setTestModeEnabled(false);
+    }
 
     // ── existing tests (unchanged) ──────────────────────────────────────────
 
@@ -124,6 +136,8 @@ private Q_SLOTS:
     }
 
     void instance_returnsConstructedManager() {
+        // Each test method runs sequentially; the previous test's FenceManager
+        // destructor has already cleared s_instance before this runs.
         QTemporaryDir tmp;
         FenceManager mgr(tmp.path());
         QCOMPARE(FenceManager::instance(), &mgr);
@@ -279,16 +293,18 @@ private Q_SLOTS:
         QTemporaryDir tmp;
         FenceManager mgr(tmp.path());
         mgr.createFence(QStringLiteral("DP-1"), QRect(0, 0, 400, 300));
-        mgr.save();
+        mgr.save(); // create the file first
 
         const QString configPath = tmp.path() + QStringLiteral("/fences.json");
+        // Guarantee permission restoration even if the test aborts mid-way.
+        auto restorePerms = qScopeGuard([&] {
+            QFile::setPermissions(configPath,
+                QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+        });
         QFile::setPermissions(configPath,
             QFileDevice::ReadOwner | QFileDevice::ReadGroup | QFileDevice::ReadOther);
 
         mgr.save(); // must not crash — just warns
-
-        QFile::setPermissions(configPath,
-            QFileDevice::ReadOwner | QFileDevice::WriteOwner);
     }
 
     void moveUrlsToFence_withMissingDirectory_doesNotCrash() {
