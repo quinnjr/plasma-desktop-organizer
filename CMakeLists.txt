@@ -24,6 +24,8 @@ find_package(KF6 REQUIRED COMPONENTS
 )
 find_package(LayerShellQt REQUIRED)
 
+option(BUILD_COVERAGE "Enable gcov coverage instrumentation" OFF)
+
 add_library(organizer_core STATIC
     src/application.cpp
     src/fencemanager.cpp
@@ -49,6 +51,11 @@ target_link_libraries(organizer_core PRIVATE
     Qt6::Qml
     LayerShellQt::Interface
 )
+
+if(BUILD_COVERAGE)
+    target_compile_options(organizer_core PRIVATE --coverage -O0 -g)
+    target_link_options(organizer_core PRIVATE --coverage)
+endif()
 
 qt_add_resources(QML_RESOURCES qml/qml.qrc)
 
@@ -77,4 +84,31 @@ install(FILES data/plasma-organizer.desktop
 if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if(BUILD_COVERAGE)
+    find_program(LCOV_BIN lcov REQUIRED)
+    find_program(GENHTML_BIN genhtml REQUIRED)
+    add_custom_target(coverage
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>
+        COMMAND ${LCOV_BIN}
+                --capture
+                --directory ${CMAKE_BINARY_DIR}
+                --output-file ${CMAKE_BINARY_DIR}/coverage.info
+                --exclude "*/${CMAKE_SOURCE_DIR}/build/*"
+                --exclude "*/tests/*"
+                --exclude "/usr/*"
+                --exclude "*/moc_*"
+                --exclude "*_autogen*"
+                --exclude "*/application.cpp"
+                --exclude "*/layershellwindow.cpp"
+                --exclude "*/main.cpp"
+        COMMAND ${GENHTML_BIN}
+                ${CMAKE_BINARY_DIR}/coverage.info
+                --output-directory ${CMAKE_BINARY_DIR}/coverage_html
+                --legend --show-details
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Running tests and generating HTML coverage report"
+        DEPENDS plasma-organizer
+    )
 endif()

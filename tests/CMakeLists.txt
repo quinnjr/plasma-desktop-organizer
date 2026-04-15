@@ -11,6 +11,10 @@ function(add_organizer_test name)
         KF6::IconThemes
         organizer_core
     )
+    if(BUILD_COVERAGE)
+        target_compile_options(${name} PRIVATE --coverage -O0 -g)
+        target_link_options(${name} PRIVATE --coverage)
+    endif()
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 

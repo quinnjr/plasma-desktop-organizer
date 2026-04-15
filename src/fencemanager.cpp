@@ -220,6 +220,7 @@ void FenceManager::moveUrlsToFence(const QStringList &urls, const QString &fence
     }
     if (srcUrls.isEmpty()) return;
 
+    // LCOV_EXCL_START - KIO async ops require a live KIO scheduler; covered by integration tests
     auto *job = KIO::move(srcUrls, QUrl::fromLocalFile(destDir));
     // KIO jobs auto-delete; do not store or delete this pointer
     connect(job, &KJob::result, this, [](KJob *job) {
@@ -228,6 +229,7 @@ void FenceManager::moveUrlsToFence(const QStringList &urls, const QString &fence
         }
     });
     job->start();
+    // LCOV_EXCL_STOP
 }
 
 void FenceManager::moveUrlsToDesktop(const QStringList &urls)
@@ -250,6 +252,7 @@ void FenceManager::moveUrlsToDesktop(const QStringList &urls)
     }
     if (srcUrls.isEmpty()) return;
 
+    // LCOV_EXCL_START - KIO async ops require a live KIO scheduler; covered by integration tests
     auto *job = KIO::move(srcUrls, QUrl::fromLocalFile(desktopPath));
     // KIO jobs auto-delete; do not store or delete this pointer
     connect(job, &KJob::result, this, [](KJob *job) {
@@ -258,6 +261,7 @@ void FenceManager::moveUrlsToDesktop(const QStringList &urls)
         }
     });
     job->start();
+    // LCOV_EXCL_STOP
 }
 
 QString FenceManager::defaultBasePath() const
