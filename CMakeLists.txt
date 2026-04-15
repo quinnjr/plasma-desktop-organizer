@@ -93,13 +93,12 @@ if(BUILD_COVERAGE)
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>
         COMMAND ${LCOV_BIN}
                 --capture
+                --ignore-errors mismatch,source
                 --directory ${CMAKE_BINARY_DIR}
                 --output-file ${CMAKE_BINARY_DIR}/coverage.info
-                --exclude "*/${CMAKE_SOURCE_DIR}/build/*"
+                --exclude "${CMAKE_BINARY_DIR}/*"
                 --exclude "*/tests/*"
                 --exclude "/usr/*"
-                --exclude "*/moc_*"
-                --exclude "*_autogen*"
                 --exclude "*/application.cpp"
                 --exclude "*/layershellwindow.cpp"
                 --exclude "*/main.cpp"
@@ -109,6 +108,6 @@ if(BUILD_COVERAGE)
                 --legend --show-details
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running tests and generating HTML coverage report"
-        DEPENDS plasma-organizer
+        DEPENDS test_fencemanager test_fencemodel test_fencefilemodel
     )
 endif()
