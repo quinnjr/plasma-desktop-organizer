@@ -45,6 +45,7 @@ target_link_libraries(organizer_core PRIVATE
     KF6::KIOCore
     KF6::IconThemes
     KF6::ConfigCore
+    Qt6::Qml
     LayerShellQt::Interface
 )
 

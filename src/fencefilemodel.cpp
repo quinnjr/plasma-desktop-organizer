@@ -121,6 +121,10 @@ void FenceFileModel::onCreated(const QString &path)
     if (findByPath(path) >= 0) return; // already have it
 
     KFileItem item(QUrl::fromLocalFile(path));
+    if (item.name().endsWith(QLatin1String(".desktop"))) {
+        KDesktopFile df(path);
+        m_desktopCache.insert(path, {df.readName(), df.readIcon()});
+    }
     const int newIndex = m_items.size();
     beginInsertRows(QModelIndex(), newIndex, newIndex);
     m_items.append(item);
