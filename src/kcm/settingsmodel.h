@@ -124,4 +124,7 @@ private:
     int m_minFenceHeight = 80;
 
     bool m_needsSave = false;
+    bool m_loading = false;
+
+    static QString defaultDataDirectory();
 };
