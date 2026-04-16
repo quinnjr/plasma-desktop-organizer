@@ -85,4 +85,6 @@ private:
 
     KSharedConfig::Ptr m_config;
     static OrganizerSettings *s_instance;
+
+    friend class TestOrganizerSettings;
 };

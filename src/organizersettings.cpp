@@ -8,15 +8,21 @@ OrganizerSettings::OrganizerSettings(QObject *parent)
     : QObject(parent)
     , m_config(KSharedConfig::openConfig(QStringLiteral("plasma-desktop-organizerrc")))
 {
+    Q_ASSERT_X(!s_instance, "OrganizerSettings", "Singleton already exists");
+    s_instance = this;
 }
 
-OrganizerSettings::~OrganizerSettings() = default;
+OrganizerSettings::~OrganizerSettings()
+{
+    if (s_instance == this) {
+        s_instance = nullptr;
+    }
+}
 
 OrganizerSettings *OrganizerSettings::instance()
 {
-    if (!s_instance) {
-        s_instance = new OrganizerSettings();
-    }
+    Q_ASSERT_X(s_instance, "OrganizerSettings::instance",
+               "Singleton not constructed. Must create OrganizerSettings before calling instance()");
     return s_instance;
 }
 
@@ -41,6 +47,10 @@ int OrganizerSettings::defaultIconSize() const
 
 void OrganizerSettings::setDefaultIconSize(int size)
 {
+    if (size < 16 || size > 256) {
+        qWarning() << "Invalid icon size:" << size << "(must be 16-256), clamping";
+        size = qBound(16, size, 256);
+    }
     KConfigGroup general = m_config->group(QStringLiteral("General"));
     general.writeEntry("DefaultIconSize", size);
 }
@@ -78,6 +88,10 @@ int OrganizerSettings::fenceOpacity() const
 
 void OrganizerSettings::setFenceOpacity(int opacity)
 {
+    if (opacity < 0 || opacity > 100) {
+        qWarning() << "Invalid fence opacity:" << opacity << "(must be 0-100), clamping";
+        opacity = qBound(0, opacity, 100);
+    }
     KConfigGroup appearance = m_config->group(QStringLiteral("Appearance"));
     appearance.writeEntry("FenceOpacity", opacity);
 }
@@ -102,6 +116,10 @@ int OrganizerSettings::titleBarHeight() const
 
 void OrganizerSettings::setTitleBarHeight(int height)
 {
+    if (height < 16 || height > 100) {
+        qWarning() << "Invalid title bar height:" << height << "(must be 16-100), clamping";
+        height = qBound(16, height, 100);
+    }
     KConfigGroup appearance = m_config->group(QStringLiteral("Appearance"));
     appearance.writeEntry("TitleBarHeight", height);
 }
@@ -138,6 +156,10 @@ int OrganizerSettings::gridSize() const
 
 void OrganizerSettings::setGridSize(int size)
 {
+    if (size < 5 || size > 100) {
+        qWarning() << "Invalid grid size:" << size << "(must be 5-100), clamping";
+        size = qBound(5, size, 100);
+    }
     KConfigGroup appearance = m_config->group(QStringLiteral("Appearance"));
     appearance.writeEntry("GridSize", size);
 }
@@ -177,6 +199,10 @@ int OrganizerSettings::clickThroughDelay() const
 
 void OrganizerSettings::setClickThroughDelay(int ms)
 {
+    if (ms < 0 || ms > 5000) {
+        qWarning() << "Invalid click-through delay:" << ms << "(must be 0-5000ms), clamping";
+        ms = qBound(0, ms, 5000);
+    }
     KConfigGroup advanced = m_config->group(QStringLiteral("Advanced"));
     advanced.writeEntry("ClickThroughDelay", ms);
 }
@@ -189,6 +215,10 @@ int OrganizerSettings::minFenceWidth() const
 
 void OrganizerSettings::setMinFenceWidth(int width)
 {
+    if (width < 50 || width > 500) {
+        qWarning() << "Invalid minimum fence width:" << width << "(must be 50-500), clamping";
+        width = qBound(50, width, 500);
+    }
     KConfigGroup advanced = m_config->group(QStringLiteral("Advanced"));
     advanced.writeEntry("MinFenceWidth", width);
 }
@@ -201,6 +231,10 @@ int OrganizerSettings::minFenceHeight() const
 
 void OrganizerSettings::setMinFenceHeight(int height)
 {
+    if (height < 40 || height > 400) {
+        qWarning() << "Invalid minimum fence height:" << height << "(must be 40-400), clamping";
+        height = qBound(40, height, 400);
+    }
     KConfigGroup advanced = m_config->group(QStringLiteral("Advanced"));
     advanced.writeEntry("MinFenceHeight", height);
 }
