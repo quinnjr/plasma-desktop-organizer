@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Service
+Exec=kcminit plasma_organizer
+Icon=view-split-left-right
+X-KDE-ServiceTypes=KCModule
+
+X-KDE-Library=kcm_plasma_organizer
+X-KDE-ParentApp=kcontrol
+X-KDE-System-Settings-Parent-Category=workspace
+X-KDE-Weight=70
+
+Name=Desktop Organizer
+Comment=Configure the Plasma Desktop Organizer
+
+Categories=Qt;KDE;X-KDE-settings-lookandfeel;
