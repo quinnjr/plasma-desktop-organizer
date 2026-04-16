@@ -1,0 +1,18 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "423821+quinnjr@users.noreply.github.com",
+                "Name": "Joseph R. Quinn"
+            }
+        ],
+        "Category": "Workspace",
+        "Description": "Configure the Plasma Desktop Organizer",
+        "Icon": "view-split-left-right",
+        "Id": "kcm_plasma_organizer",
+        "License": "MIT",
+        "Name": "Desktop Organizer",
+        "Version": "0.1.0",
+        "Website": "https://github.com/quinnjr/plasma-desktop-organizer"
+    }
+}
