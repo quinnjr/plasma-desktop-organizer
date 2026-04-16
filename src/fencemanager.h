@@ -31,6 +31,10 @@ public:
     Q_INVOKABLE void resizeFence(const QString &id, int x, int y, int width, int height);
     Q_INVOKABLE void setRolledUp(const QString &id, bool rolledUp);
 
+public Q_SLOTS:
+    void onConfigurationReloaded();
+
+public:
     Q_INVOKABLE void moveUrlsToFence(const QStringList &urls, const QString &fenceId);
     Q_INVOKABLE void moveUrlsToDesktop(const QStringList &urls);
 

@@ -113,4 +113,7 @@ void Application::onConfigurationReloaded()
                           ? KStatusNotifierItem::Active
                           : KStatusNotifierItem::Passive);
     }
+
+    // Notify fence manager of config changes
+    m_mgr->onConfigurationReloaded();
 }

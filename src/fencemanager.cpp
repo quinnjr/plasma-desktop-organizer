@@ -11,14 +11,21 @@
 #include <QtGlobal>
 #include <KIO/CopyJob>
 #include <KJob>
+#include "organizersettings.h"
 
 FenceManager *FenceManager::s_instance = nullptr;
 
 FenceManager::FenceManager(const QString &basePath, QObject *parent)
     : QObject(parent)
-    , m_basePath(basePath.isEmpty() ? defaultBasePath() : basePath)
+    , m_basePath(basePath)
 {
     if (!s_instance) s_instance = this;
+
+    // Determine actual base path
+    if (m_basePath.isEmpty()) {
+        m_basePath = OrganizerSettings::instance()->dataDirectory();
+    }
+
     m_configPath = m_basePath + QStringLiteral("/fences.json");
     QDir().mkpath(m_basePath);
 }
@@ -47,6 +54,7 @@ Fence FenceManager::createFence(const QString &screen,
     Fence f;
     f.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     f.title = title;
+    f.iconSize = OrganizerSettings::instance()->defaultIconSize();
     f.screen = screen;
     f.x = geometry.x();
     f.y = geometry.y();
@@ -268,4 +276,16 @@ QString FenceManager::defaultBasePath() const
 {
     return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
            + QStringLiteral("/dev.quinnjr.desktop-organizer");
+}
+
+void FenceManager::onConfigurationReloaded()
+{
+    // Check if data directory changed (requires restart)
+    const QString newDataDir = OrganizerSettings::instance()->dataDirectory();
+    if (newDataDir != m_basePath) {
+        qWarning() << "Data directory changed to" << newDataDir
+                   << "- restart required for this change to take effect";
+    }
+
+    // Future fence creations will use updated default icon size
 }

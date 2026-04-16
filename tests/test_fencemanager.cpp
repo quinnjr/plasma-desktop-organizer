@@ -4,6 +4,7 @@
 #include <QScopeGuard>
 #include <QStandardPaths>
 #include "fencemanager.h"
+#include "organizersettings.h"
 
 class TestFenceManager : public QObject {
     Q_OBJECT
@@ -14,11 +15,19 @@ private Q_SLOTS:
         // Redirect all QStandardPaths locations to ~/.qttest/ to prevent
         // any test from accidentally touching real user data directories.
         QStandardPaths::setTestModeEnabled(true);
+
+        // FenceManager now depends on OrganizerSettings for icon size defaults
+        m_settings = new OrganizerSettings(this);
     }
 
     void cleanupTestCase() {
+        delete m_settings;
+        m_settings = nullptr;
         QStandardPaths::setTestModeEnabled(false);
     }
+
+private:
+    OrganizerSettings *m_settings = nullptr;
 
     // ── existing tests (unchanged) ──────────────────────────────────────────
 

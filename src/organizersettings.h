@@ -87,4 +87,6 @@ private:
     static OrganizerSettings *s_instance;
 
     friend class TestOrganizerSettings;
+    friend class TestFenceManager;
+    friend class TestFenceModel;
 };

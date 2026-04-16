@@ -4,6 +4,7 @@
 #include <QStandardPaths>
 #include "fencemodel.h"
 #include "fencemanager.h"
+#include "organizersettings.h"
 
 class TestFenceModel : public QObject {
     Q_OBJECT
@@ -12,11 +13,17 @@ private Q_SLOTS:
 
     void initTestCase() {
         QStandardPaths::setTestModeEnabled(true);
+        m_settings = new OrganizerSettings(this);
     }
 
     void cleanupTestCase() {
+        delete m_settings;
+        m_settings = nullptr;
         QStandardPaths::setTestModeEnabled(false);
     }
+
+private:
+    OrganizerSettings *m_settings = nullptr;
 
     // ── existing tests (unchanged) ──────────────────────────────────────────
 
