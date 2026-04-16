@@ -1,0 +1,186 @@
+name: Build Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (without v prefix)'
+        required: true
+        default: '0.2.0'
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  build-deb:
+    name: Build .deb for ${{ matrix.distro_name }} ${{ matrix.distro_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - distro: ubuntu:24.04
+            distro_name: ubuntu
+            distro_version: '24.04'
+          - distro: ubuntu:24.10
+            distro_name: ubuntu
+            distro_version: '24.10'
+          - distro: debian:13
+            distro_name: debian
+            distro_version: '13'
+
+    container:
+      image: ${{ matrix.distro }}
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential debhelper cmake extra-cmake-modules git ca-certificates \
+            qtbase6-dev qtdeclarative6-dev qtquickcontrols2-6-dev \
+            libkf6coreaddons-dev libkf6config-dev libkf6kio-dev \
+            libkf6iconthemes-dev libkf6svg-dev libkf6statusnotifieritem-dev \
+            libkf6windowsystem-dev libkf6kcmutils-dev libkf6configwidgets-dev \
+            libkf6dbusaddons-dev liblayershellqt-dev
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version $VERSION"
+
+      - name: Prepare source tree
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          # Update changelog with current version
+          sed -i "s/0\.2\.0-1/${VERSION}-1/" packaging/debian/changelog
+          sed -i "s/UNRELEASED/${{ matrix.distro_name }}/" packaging/debian/changelog
+          # Create orig tarball
+          mkdir -p /tmp/build
+          tar czf /tmp/build/plasma-desktop-organizer_${VERSION}.orig.tar.gz \
+            --exclude=.git --exclude=.github --exclude=build --exclude=.worktrees \
+            --transform="s,^,plasma-desktop-organizer-${VERSION}/," .
+
+      - name: Build Debian package
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          cd /tmp/build
+          tar xzf plasma-desktop-organizer_${VERSION}.orig.tar.gz
+          cd plasma-desktop-organizer-${VERSION}
+          cp -r packaging/debian .
+          dpkg-buildpackage -b -uc -us
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ matrix.distro_name }}-${{ matrix.distro_version }}
+          path: /tmp/build/*.deb
+          retention-days: 7
+
+  build-rpm:
+    name: Build .rpm for Fedora ${{ matrix.fedora_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fedora_version: ['40', '41']
+    
+    container:
+      image: fedora:${{ matrix.fedora_version }}
+    
+    steps:
+      - name: Install build dependencies
+        run: |
+          dnf install -y \
+            cmake extra-cmake-modules gcc-c++ rpm-build rpmdevtools git \
+            qt6-qtbase-devel qt6-qtdeclarative-devel \
+            kf6-kcoreaddons-devel kf6-kconfig-devel kf6-kio-devel \
+            kf6-kiconthemes-devel kf6-ksvg-devel kf6-kstatusnotifieritem-devel \
+            kf6-kwindowsystem-devel kf6-kcmutils-devel kf6-kconfigwidgets-devel \
+            kf6-kdbusaddons-devel layer-shell-qt-devel
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version $VERSION"
+      
+      - name: Setup RPM build tree
+        run: |
+          rpmdev-setuptree
+      
+      - name: Prepare source tarball
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          # Update spec file version
+          sed -i "s/^Version:.*/Version:        ${VERSION}/" packaging/rpm/plasma-desktop-organizer.spec
+          # Create source tarball
+          tar czf ~/rpmbuild/SOURCES/plasma-desktop-organizer-${VERSION}.tar.gz \
+            --exclude=.git --exclude=.github --exclude=build --exclude=.worktrees \
+            --transform="s,^,plasma-desktop-organizer-${VERSION}/," .
+          # Copy spec file
+          cp packaging/rpm/plasma-desktop-organizer.spec ~/rpmbuild/SPECS/
+      
+      - name: Build RPM package
+        run: |
+          rpmbuild -bb ~/rpmbuild/SPECS/plasma-desktop-organizer.spec
+      
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm-fedora-${{ matrix.fedora_version }}
+          path: ~/rpmbuild/RPMS/x86_64/*.rpm
+          retention-days: 7
+
+
+  upload-release:
+    name: Upload packages to GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-deb, build-rpm]
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: packages
+      
+      - name: Display structure of downloaded files
+        run: ls -R packages/
+      
+      - name: Flatten package directory
+        run: |
+          mkdir -p release-packages
+          find packages -name '*.deb' -exec cp {} release-packages/ \;
+          find packages -name '*.rpm' -exec cp {} release-packages/ \;
+          ls -lh release-packages/
+      
+      - name: Upload packages to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release-packages/*
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
