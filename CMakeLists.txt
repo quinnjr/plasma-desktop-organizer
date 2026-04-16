@@ -32,6 +32,7 @@ add_library(organizer_core STATIC
     src/fencemodel.cpp
     src/fencefilemodel.cpp
     src/layershellwindow.cpp
+    src/organizersettings.cpp
 )
 target_include_directories(organizer_core PUBLIC src)
 target_compile_definitions(organizer_core PRIVATE
