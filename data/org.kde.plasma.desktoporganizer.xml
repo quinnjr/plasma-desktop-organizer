@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.kde.plasma.DesktopOrganizer">
+    <method name="showAllFences"/>
+    <method name="hideAllFences"/>
+    <method name="reloadConfiguration"/>
+    <method name="quit"/>
+    <property name="isRunning" type="b" access="read"/>
+    <property name="fenceCount" type="i" access="read"/>
+    <property name="version" type="s" access="read"/>
+    <signal name="configurationReloaded"/>
+  </interface>
+</node>
