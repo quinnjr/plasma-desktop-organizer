@@ -1,0 +1,34 @@
+Source: plasma-desktop-organizer
+Section: kde
+Priority: optional
+Maintainer: Joseph R. Quinn
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.22),
+               extra-cmake-modules (>= 6.0),
+               qtbase6-dev,
+               qtdeclarative6-dev,
+               qtquickcontrols2-6-dev,
+               libkf6coreaddons-dev,
+               libkf6config-dev,
+               libkf6kio-dev,
+               libkf6iconthemes-dev,
+               libkf6svg-dev,
+               libkf6statusnotifieritem-dev,
+               libkf6windowsystem-dev,
+               libkf6kcmutils-dev,
+               libkf6configwidgets-dev,
+               libkf6dbusaddons-dev,
+               liblayershellqt-dev (>= 6.0)
+Standards-Version: 4.6.0
+Homepage: https://github.com/quinnjr/plasma-desktop-organizer
+
+Package: plasma-desktop-organizer
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Fences-style desktop organizer for KDE Plasma
+ Plasma Desktop Organizer provides customizable fence containers that overlay
+ the native Plasma desktop, allowing organization of desktop items without
+ replacing the desktop shell.
+ .
+ Features include drag-and-drop file management, KIO integration, live updates
+ via KDirWatch, system tray control, and System Settings integration via KCM.
