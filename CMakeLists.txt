@@ -33,6 +33,7 @@ add_library(organizer_core STATIC
     src/fencefilemodel.cpp
     src/layershellwindow.cpp
     src/organizersettings.cpp
+    src/dbusinterface.cpp
 )
 target_include_directories(organizer_core PUBLIC src)
 target_compile_definitions(organizer_core PRIVATE
@@ -50,6 +51,7 @@ target_link_libraries(organizer_core PRIVATE
     KF6::IconThemes
     KF6::StatusNotifierItem
     Qt6::Qml
+    Qt6::DBus
     LayerShellQt::Interface
 )
 

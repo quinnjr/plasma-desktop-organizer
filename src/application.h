@@ -14,6 +14,8 @@ public:
 
     bool init();
 
+    const QList<LayerShellWindow *> &windows() const { return m_windows; }
+
 private Q_SLOTS:
     void onScreenAdded(QScreen *screen);
     void onScreenRemoved(QScreen *screen);
