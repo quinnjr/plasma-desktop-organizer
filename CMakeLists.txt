@@ -21,6 +21,9 @@ find_package(KF6 REQUIRED COMPONENTS
     Svg
     StatusNotifierItem
     WindowSystem
+    KCMUtils
+    ConfigWidgets
+    DBusAddons
 )
 find_package(LayerShellQt REQUIRED)
 
@@ -53,7 +56,16 @@ target_link_libraries(organizer_core PRIVATE
     Qt6::Qml
     Qt6::DBus
     LayerShellQt::Interface
+    KF6::DBusAddons
 )
+
+# Generate D-Bus adaptor from XML
+qt_add_dbus_adaptor(DBUS_SOURCES
+    data/org.kde.plasma.desktoporganizer.xml
+    src/dbusinterface.h
+    DBusInterface
+)
+target_sources(organizer_core PRIVATE ${DBUS_SOURCES})
 
 if(BUILD_COVERAGE)
     target_compile_options(organizer_core PRIVATE --coverage -O0 -g)
@@ -76,6 +88,29 @@ target_link_libraries(plasma-organizer PRIVATE
     LayerShellQt::Interface
 )
 
+# Build KCM plugin
+kcoreaddons_add_plugin(kcm_plasma_organizer
+    SOURCES
+        src/kcm/kcm_organizer.cpp
+        src/kcm/settingsmodel.cpp
+        src/kcm/dbusclient.cpp
+    INSTALL_NAMESPACE "plasma/kcms/systemsettings"
+)
+
+target_link_libraries(kcm_plasma_organizer
+    KF6::KCMUtils
+    KF6::ConfigCore
+    Qt6::DBus
+    Qt6::Quick
+    Qt6::Qml
+)
+
+# Install KCM UI files
+install(DIRECTORY src/kcm/ui/
+    DESTINATION ${KDE_INSTALL_DATADIR}/kcm_plasma_organizer
+    FILES_MATCHING PATTERN "*.qml"
+)
+
 install(TARGETS plasma-organizer
     DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
@@ -83,6 +118,18 @@ install(TARGETS plasma-organizer
 install(FILES data/plasma-organizer.desktop
     DESTINATION ${KDE_INSTALL_AUTOSTARTDIR}
 )
+
+install(FILES data/kcm_plasma_organizer.desktop
+    DESTINATION ${KDE_INSTALL_APPDIR})
+
+configure_file(
+    data/org.kde.plasma.desktoporganizer.service.in
+    ${CMAKE_CURRENT_BINARY_DIR}/org.kde.plasma.desktoporganizer.service
+    @ONLY
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.kde.plasma.desktoporganizer.service
+    DESTINATION ${KDE_INSTALL_DBUSSERVICEDIR})
 
 if(BUILD_TESTING)
     enable_testing()
