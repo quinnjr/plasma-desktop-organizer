@@ -1,13 +1,17 @@
 #include "application.h"
+#include "dbusinterface.h"
 #include "fencefilemodel.h"
 #include "fencemanager.h"
 #include "layershellwindow.h"
+#include "organizersettings.h"
 
 #include <QScreen>
 #include <QDebug>
 #include <QMenu>
 #include <QAction>
 #include <QtQml>
+#include <QDBusConnection>
+#include <QDBusError>
 
 Application::Application(int &argc, char **argv)
     : QGuiApplication(argc, argv)
@@ -25,6 +29,23 @@ bool Application::init()
 
     m_mgr = new FenceManager(QString(), this);
     m_mgr->load();
+
+    // Create D-Bus interface
+    m_dbus = new DBusInterface(this, m_mgr, this);
+
+    // Register on session bus
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    if (!sessionBus.registerService(QStringLiteral("org.kde.plasma.desktoporganizer"))) {
+        qWarning() << "Failed to register D-Bus service:" << sessionBus.lastError().message();
+    }
+    if (!sessionBus.registerObject(QStringLiteral("/org/kde/plasma/desktoporganizer"), m_dbus,
+                                    QDBusConnection::ExportScriptableContents)) {
+        qWarning() << "Failed to register D-Bus object:" << sessionBus.lastError().message();
+    }
+
+    // Connect configuration reload signal
+    connect(m_dbus, &DBusInterface::configurationReloaded,
+            this, &Application::onConfigurationReloaded);
 
     for (QScreen *screen : screens()) {
         createWindowForScreen(screen);
@@ -81,5 +102,15 @@ void Application::onScreenRemoved(QScreen *screen)
             delete m_windows.takeAt(i);
             break;
         }
+    }
+}
+
+void Application::onConfigurationReloaded()
+{
+    // Update system tray visibility based on settings
+    if (m_tray) {
+        m_tray->setStatus(OrganizerSettings::instance()->showSystemTray()
+                          ? KStatusNotifierItem::Active
+                          : KStatusNotifierItem::Passive);
     }
 }

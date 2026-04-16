@@ -3,6 +3,7 @@
 #include <QList>
 #include <KStatusNotifierItem>
 
+class DBusInterface;
 class FenceManager;
 class LayerShellWindow;
 
@@ -19,11 +20,13 @@ public:
 private Q_SLOTS:
     void onScreenAdded(QScreen *screen);
     void onScreenRemoved(QScreen *screen);
+    void onConfigurationReloaded();
 
 private:
     void createWindowForScreen(QScreen *screen);
 
     FenceManager *m_mgr = nullptr;
     QList<LayerShellWindow *> m_windows;
+    DBusInterface *m_dbus = nullptr;
     KStatusNotifierItem *m_tray = nullptr;
 };
