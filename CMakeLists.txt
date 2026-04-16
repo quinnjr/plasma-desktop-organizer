@@ -44,9 +44,9 @@ target_link_libraries(organizer_core PUBLIC
     KF6::CoreAddons
 )
 target_link_libraries(organizer_core PRIVATE
+    KF6::ConfigCore
     KF6::KIOCore
     KF6::IconThemes
-    KF6::ConfigCore
     KF6::StatusNotifierItem
     Qt6::Qml
     LayerShellQt::Interface

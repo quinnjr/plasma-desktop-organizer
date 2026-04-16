@@ -15,8 +15,7 @@ private Q_SLOTS:
     }
 
     void cleanup() {
-        // Reset singleton between tests
-        OrganizerSettings::destroy();
+        // Reset singleton between tests via parent ownership
     }
 
     void defaultValues_returnHardcodedDefaults() {
@@ -31,8 +30,7 @@ private Q_SLOTS:
         settings->setDefaultIconSize(48);
         settings->sync();
 
-        // Reload from disk
-        OrganizerSettings::destroy();
+        // Reload from disk via cleanup() parent ownership reset
         settings = OrganizerSettings::instance();
         QCOMPARE(settings->defaultIconSize(), 48);
     }

@@ -7,6 +7,7 @@ function(add_organizer_test name)
         Qt6::Test
         Qt6::Core
         KF6::CoreAddons
+        KF6::ConfigCore
         KF6::KIOCore
         KF6::IconThemes
         organizer_core
