@@ -4,3 +4,4 @@ CMakeFiles/
 *.swp
 *~
 docs/superpowers/
+.worktrees/
