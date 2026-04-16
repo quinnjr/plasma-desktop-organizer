@@ -11,6 +11,8 @@ KCM.ScrollViewKCM {
     implicitWidth: Kirigami.Units.gridUnit * 40
     implicitHeight: Kirigami.Units.gridUnit * 30
 
+    property int currentPageIndex: 0
+
     SettingsModel {
         id: settingsModel
     }
@@ -62,29 +64,41 @@ KCM.ScrollViewKCM {
             QQC2.ItemDelegate {
                 text: "General"
                 Layout.fillWidth: true
-                highlighted: stackView.currentItem === generalPage
-                onClicked: stackView.replace(generalPage)
+                highlighted: root.currentPageIndex === 0
+                onClicked: {
+                    stackView.replace(generalPage)
+                    root.currentPageIndex = 0
+                }
             }
 
             QQC2.ItemDelegate {
                 text: "Appearance"
                 Layout.fillWidth: true
-                highlighted: stackView.currentItem === appearancePage
-                onClicked: stackView.replace(appearancePage)
+                highlighted: root.currentPageIndex === 1
+                onClicked: {
+                    stackView.replace(appearancePage)
+                    root.currentPageIndex = 1
+                }
             }
 
             QQC2.ItemDelegate {
                 text: "Advanced"
                 Layout.fillWidth: true
-                highlighted: stackView.currentItem === advancedPage
-                onClicked: stackView.replace(advancedPage)
+                highlighted: root.currentPageIndex === 2
+                onClicked: {
+                    stackView.replace(advancedPage)
+                    root.currentPageIndex = 2
+                }
             }
 
             QQC2.ItemDelegate {
                 text: "About"
                 Layout.fillWidth: true
-                highlighted: stackView.currentItem === aboutPage
-                onClicked: stackView.replace(aboutPage)
+                highlighted: root.currentPageIndex === 3
+                onClicked: {
+                    stackView.replace(aboutPage)
+                    root.currentPageIndex = 3
+                }
             }
 
             Item { Layout.fillHeight: true }
