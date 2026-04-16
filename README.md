@@ -74,6 +74,50 @@ xdg-open build/coverage_html/index.html
 
 Current coverage: **94.4%** (337/357 lines)
 
+## Installation
+
+### From Packages
+
+**Ubuntu/Debian:**
+
+```bash
+# Download the .deb package for your distribution
+wget https://github.com/quinnjr/plasma-desktop-organizer/releases/download/v0.2.0/plasma-desktop-organizer_0.2.0-1_amd64.deb
+
+# Install package and dependencies
+sudo dpkg -i plasma-desktop-organizer_0.2.0-1_amd64.deb
+sudo apt-get install -f
+```
+
+**Fedora:**
+
+```bash
+# Download the .rpm package for your Fedora version
+wget https://github.com/quinnjr/plasma-desktop-organizer/releases/download/v0.2.0/plasma-desktop-organizer-0.2.0-1.fc41.x86_64.rpm
+
+# Install package and dependencies
+sudo dnf install plasma-desktop-organizer-0.2.0-1.fc41.x86_64.rpm
+```
+
+**Arch Linux:**
+
+```bash
+# Build and install from AUR (if available)
+yay -S plasma-desktop-organizer
+```
+
+### From Source
+
+Build and install from source using CMake (see Building section above):
+
+```bash
+cmake -B build -DCMAKE_INSTALL_PREFIX=~/.local -DBUILD_TESTING=ON
+cmake --build build --parallel
+cmake --install build
+
+# Then add ~/.local/bin to your PATH if not already present
+```
+
 ## Usage
 
 ### First Run
